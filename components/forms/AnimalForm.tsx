@@ -1,0 +1,314 @@
+"use client";
+
+import { useState } from "react";
+import { Animal } from "@/types/animal";
+
+interface AnimalFormProps {
+  initialData?: Animal | null;
+  onCancel: () => void;
+  onSubmit: (animal: Animal) => void;
+}
+
+const defaultFormState = {
+  name: "",
+  animalType: "Cattle",
+  breed: "",
+  sex: "Female",
+  age: "",
+  status: "Active",
+  neutered: "Intact",
+  coloring: "",
+  description: "",
+  methodAcquired: "Raised on Farm",
+  veterinarian: "",
+  matureWeight: "",
+  estimatedValue: "",
+};
+
+export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps) {
+  const [formData, setFormData] = useState<Omit<Animal, "id">>(() => {
+    if (initialData) {
+      const { id, ...rest } = initialData;
+      return rest;
+    }
+    return defaultFormState;
+  });
+
+  const isEditing = Boolean(initialData);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const createAnimalObject = (): Animal => ({
+    id: initialData?.id || Date.now().toString(),
+    ...formData,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name) return;
+    onSubmit(createAnimalObject());
+  };
+
+  const handleSaveAndNew = () => {
+    if (!formData.name) return;
+    onSubmit(createAnimalObject());
+    setFormData(defaultFormState);
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-xs space-y-8 font-mono">
+      <h2 className="text-xl font-mono text-gray-800 border-b pb-4">
+        {isEditing ? `Edit Animal: ${initialData?.name}` : "New Animal"}
+      </h2>
+
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Basic Information */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-mono text-gray-700 border-b pb-2">Basic Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-4xl">
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Name/Label</label>
+              <input
+                type="text"
+                name="name"
+                required
+                value={formData.name}
+                onChange={handleInputChange}
+                className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Animal Type</label>
+              <input
+                type="text"
+                name="animalType"
+                value={formData.animalType}
+                onChange={handleInputChange}
+                className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Breed</label>
+              <input
+                type="text"
+                name="breed"
+                placeholder="Breed"
+                value={formData.breed}
+                onChange={handleInputChange}
+                className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Sex</label>
+              <select
+                name="sex"
+                value={formData.sex}
+                onChange={handleInputChange}
+                className="flex-1 border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-1 focus:ring-emerald-500 outline-none"
+              >
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+              </select>
+            </div>
+
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                className="flex-1 border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-1 focus:ring-emerald-500 outline-none"
+              >
+                <option value="Active">Active</option>
+                <option value="For Sale">For Sale</option>
+                <option value="Lactating">Lactating</option>
+                <option value="Lost">Lost</option>
+                <option value="Off Farm">Off Farm</option>
+                <option value="Quarantined">Quarantined</option>
+                <option value="Sold">Sold</option>
+                <option value="Weaning">Weaning</option>
+              </select>
+            </div>
+
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Age</label>
+              <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden">
+                <input
+                  type="number"
+                  name="age"
+                  value={formData.age}
+                  onChange={handleInputChange}
+                  className="w-full p-2 text-sm outline-none"
+                />
+                <span className="bg-gray-100 border-l border-gray-300 px-3 flex items-center text-xs text-gray-500 font-mono">
+                  yrs
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Physical Characteristics */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-mono text-gray-700 border-b pb-2">Physical Characteristics</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-4xl">
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Neutered</label>
+              <div className="flex items-center gap-4 text-sm">
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="neutered"
+                    value="Neutered"
+                    checked={formData.neutered === "Neutered"}
+                    onChange={handleInputChange}
+                    className="text-emerald-600 focus:ring-emerald-500"
+                  />
+                  Neutered
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="neutered"
+                    value="Intact"
+                    checked={formData.neutered === "Intact"}
+                    onChange={handleInputChange}
+                    className="text-emerald-600 focus:ring-emerald-500"
+                  />
+                  Intact
+                </label>
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Coloring</label>
+              <input
+                type="text"
+                name="coloring"
+                placeholder="Brown, white, Black, etc"
+                value={formData.coloring}
+                onChange={handleInputChange}
+                className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+
+            <div className="flex items-start col-span-1 md:col-span-2">
+              <label className="w-40 text-sm font-mono text-gray-700 pt-2">Description</label>
+              <textarea
+                name="description"
+                rows={3}
+                value={formData.description}
+                onChange={handleInputChange}
+                className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Information */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-mono text-gray-700 border-b pb-2">Additional Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-4xl">
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Method Acquired</label>
+              <select
+                name="methodAcquired"
+                value={formData.methodAcquired}
+                onChange={handleInputChange}
+                className="flex-1 border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-1 focus:ring-emerald-500 outline-none"
+              >
+                <option value="Raised on Farm">Raised on Farm</option>
+                <option value="Purchased">Purchased</option>
+                <option value="Gifted/Donation">Gifted/Donation</option>
+              </select>
+            </div>
+
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Veterinarian</label>
+              <input
+                type="text"
+                name="veterinarian"
+                placeholder="Select or enter veterinarian"
+                value={formData.veterinarian}
+                onChange={handleInputChange}
+                className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Mature Weight</label>
+              <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden">
+                <input
+                  type="number"
+                  name="matureWeight"
+                  value={formData.matureWeight}
+                  onChange={handleInputChange}
+                  className="w-full p-2 text-sm outline-none"
+                />
+                <span className="bg-gray-100 border-l border-gray-300 px-3 flex items-center text-xs text-gray-500 font-mono">
+                  kg
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">Estimated Value</label>
+              <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden">
+                <span className="bg-gray-100 border-r border-gray-300 px-3 flex items-center text-xs text-gray-500 font-mono">
+                  $
+                </span>
+                <input
+                  type="number"
+                  name="estimatedValue"
+                  placeholder="0.00"
+                  value={formData.estimatedValue}
+                  onChange={handleInputChange}
+                  className="w-full p-2 text-sm outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Buttons */}
+        <div className="pt-6 border-t flex items-center justify-between">
+          <button type="button" className="text-xs text-emerald-600 hover:underline font-mono">
+            Customize Fields
+          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 text-sm font-mono text-gray-600 hover:bg-gray-100 rounded-md transition"
+            >
+              Cancel
+            </button>
+            {!isEditing && (
+              <button
+                type="button"
+                onClick={handleSaveAndNew}
+                className="px-4 py-2 text-sm font-mono border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md transition"
+              >
+                Save & New
+              </button>
+            )}
+            <button
+              type="submit"
+              className="px-5 py-2 text-sm font-mono bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition shadow-xs"
+            >
+              {isEditing ? "Save Changes" : "Create"}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}
