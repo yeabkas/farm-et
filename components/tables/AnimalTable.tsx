@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Search, Filter } from "lucide-react";
 import { Animal } from "@/types/animal";
-import { AnimalActionDropdown } from "@/components/AnimalActionDropdown";
+import { ActionDropdown } from "@/components/ui/Dropdown";
 
 interface AnimalTableProps {
   animals: Animal[];
@@ -98,8 +98,9 @@ export function AnimalTable({ animals, onEdit, onSell, onDuplicate, onDelete }: 
                 </td>
                 <td className="p-3 text-emerald-600">{animal.animalType}</td>
                 <td className="p-3 text-right">
-  <AnimalActionDropdown 
-    animal={animal}
+  <ActionDropdown 
+    item={animal}
+    itemLabel="Animal"
     onEdit={(a) => onEdit?.(a)}
     onSell={(a) => onSell?.(a)}
     onDuplicate={(a) => onDuplicate?.(a)}

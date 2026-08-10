@@ -9,8 +9,9 @@ import {
   Sprout,
   Receipt,
   Store,
-  FolderTree,
+  BeefIcon,
 } from "lucide-react";
+import animals from "@/app/(dashboard)/livestock/[id]/page";
 
 interface SubItem {
   name: string;
@@ -29,11 +30,10 @@ const navSections: NavSection[] = [
   {
     key: "livestock",
     name: "Livestock",
-    icon: FolderTree,
+    icon: BeefIcon,
     baseHref: "/livestock",
     items: [
       { name: "Animals", href: "/livestock/animals" },
-      { name: "Livestock Groups", href: "/livestock/groups" },
     ],
   },
   {
@@ -42,8 +42,7 @@ const navSections: NavSection[] = [
     icon: Sprout,
     baseHref: "/plantings",
     items: [
-      { name: "My Crops", href: "/plantings/my-crops" },
-      { name: "Crop Plan", href: "/plantings/crop-plan" },
+      { name: "Crops", href: "/plantings/crops" },
     ],
   },
   {
@@ -55,7 +54,6 @@ const navSections: NavSection[] = [
       { name: "Transactions", href: "/accounting/transactions" },
       { name: "P&L Statement", href: "/accounting/profit-loss" },
       { name: "Cash Flow", href: "/accounting/cash-flow" },
-      { name: "Balance Sheet", href: "/accounting/balance-sheet" },
     ],
   },
   {
@@ -75,15 +73,19 @@ export function Sidebar() {
   const pathname = usePathname();
   const [openSection, setOpenSection] = useState<string | null>(null);
 
-  const activeSection = navSections.find((section) => pathname.startsWith(section.baseHref));
-  const resolvedOpenSection = activeSection?.key ?? openSection;
+  // Determine the default section to expand based on current route.
+  // This avoids the need for useEffect and avoids the React warning about
+  // calling setState synchronously inside an effect.
+  const defaultOpenSection = navSections.find((section) =>
+    pathname.startsWith(section.baseHref)
+  )?.key;
 
   const toggleSection = (key: string) => {
     setOpenSection((prev) => (prev === key ? null : key));
   };
 
   return (
-    <aside className="w-60 bg-white border-r border-gray-200 h-screen flex flex-col  font-mono select-none">
+    <aside className="w-60 bg-white border-r border-gray-200 h-screen flex flex-col font-mono select-none">
       {/* Brand Header */}
       <div className="h-16 flex items-center px-6 border-b border-gray-100">
         <Link href="/dashboard" className="flex items-center gap-2">
@@ -97,8 +99,10 @@ export function Sidebar() {
       <nav className="flex-1 py-4 px-3 space-y-1 font-mono overflow-y-auto">
         {navSections.map((section) => {
           const Icon = section.icon;
-          const isOpen = resolvedOpenSection === section.key;
           const isSectionActive = pathname.startsWith(section.baseHref);
+          const isOpen =
+            openSection === section.key ||
+            (openSection === null && defaultOpenSection === section.key);
 
           return (
             <div key={section.key} className="space-y-1 font-mono">
@@ -123,7 +127,7 @@ export function Sidebar() {
                 )}
               </button>
 
-              {/* Sub-items List (Only renders when section is open) */}
+              {/* Sub-items List */}
               {isOpen && (
                 <div className="pl-9 pr-1 space-y-1">
                   {section.items.map((subItem) => {
