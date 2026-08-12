@@ -42,7 +42,7 @@ export function Topbar() {
 
         {/* User Profile Avatar / Status */}
         <Link
-          href="/onboarding"
+          href="/"
           className="flex items-center gap-3 p-1 rounded-lg hover:bg-gray-50 transition"
         >
           <div className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold text-sm border border-green-200">

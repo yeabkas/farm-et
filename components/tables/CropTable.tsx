@@ -10,7 +10,7 @@ interface CropTableProps {
   onEdit?: (crop: Crop) => void;
   onSell?: (crop: Crop) => void;
   onDuplicate?: (crop: Crop) => void;
-  onDelete?: (id: string) => void;
+  onDelete?: (id: string | number) => void;
 }
 
 export function CropTable({
@@ -85,6 +85,7 @@ export function CropTable({
               <th className="p-3">SKU / ID</th>
               <th className="p-3">Days to Maturity</th>
               <th className="p-3">Perennial</th>
+              <th className="p-3">Status</th>
               <th className="p-3">Est. Value</th>
               <th className="p-3 w-8"></th>
             </tr>
@@ -146,10 +147,25 @@ export function CropTable({
                   )}
                 </td>
 
+                {/* Status */}
+                <td className="p-3">
+                  <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full ${
+                    crop.status === "For Sale"
+                      ? "bg-amber-100 text-amber-800 border border-amber-300"
+                      : crop.status === "Sold"
+                      ? "bg-gray-200 text-gray-500 border border-gray-300"
+                      : crop.status === "Archived"
+                      ? "bg-red-50 text-red-400 border border-red-200"
+                      : "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                  }`}>
+                    {crop.status === "For Sale" ? "🏷️ For Sale" : (crop.status ?? "Active")}
+                  </span>
+                </td>
+
                 {/* Revenue */}
                 <td className="p-3 text-gray-600">
                   {crop.estimatedValue !== undefined && crop.estimatedValue !== null
-                    ? `$${crop.estimatedValue.toFixed(2)} / ${crop.harvestUnits || "unit"}`
+                    ? `ETB ${crop.estimatedValue.toFixed(2)} / ${crop.harvestUnits || "unit"}`
                     : "--"}
                 </td>
 

@@ -5,6 +5,7 @@ import { Crop } from "@/types/crop";
 
 type CropFormState = {
   cropType: string;
+  status: string;
   varietyStrain?: string;
   botanicalName?: string;
   description?: string;
@@ -24,6 +25,7 @@ interface CropFormProps {
 
 const defaultFormState: CropFormState = {
   cropType: "",
+  status: "Active",
   varietyStrain: "",
   botanicalName: "",
   description: "",
@@ -38,9 +40,10 @@ const defaultFormState: CropFormState = {
 export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
   const [formData, setFormData] = useState<CropFormState>(() => {
     if (initialData) {
-      const { id, harvestUnits, ...rest } = initialData;
+      const { id, harvestUnits, status, ...rest } = initialData;
       return {
         ...rest,
+        status: status ?? "Active",
         harvestUnits: harvestUnits ?? "kg",
       };
     }
@@ -67,8 +70,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
     }
   };
 
-  const createCropObject = (): Crop => ({
-    id: initialData?.id || Date.now().toString(),
+  const createCropObject = () => ({
+    id: initialData?.id ?? 0,
     ...formData,
   });
 
@@ -110,6 +113,23 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
                 onChange={handleInputChange}
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
               />
+            </div>
+
+            <div className="flex items-center">
+              <label className="w-40 text-sm font-mono text-gray-700">
+                Status
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none bg-white"
+              >
+                <option value="Active">Active</option>
+                <option value="For Sale">For Sale</option>
+                <option value="Sold">Sold</option>
+                <option value="Archived">Archived</option>
+              </select>
             </div>
 
             <div className="flex items-center">

@@ -6,11 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { onboardingSchema, OnboardingFormData } from "@/lib/validations/auth-schema";
 import { useRouter } from "next/navigation";
 import { CurrencyPicker } from "@/components/ui/CurrencyPicker";
-// 🚀 CHANGED: Imported GoogleMapView component for the interactive spatial map
 import { GoogleMapView } from "@/components/ui/GoogleMapView";
+import { registerUser, submitOnboarding } from "@/lib/services";
 
 export function StepWizardForm() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
 
   const {
@@ -20,9 +22,13 @@ export function StepWizardForm() {
     trigger,
     control,
     setValue,
+    setError,
   } = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
       unitSystem: "metric",
       timezone: "UTC",
       currency: "USD",
@@ -52,7 +58,7 @@ export function StepWizardForm() {
   const handleNextStep = async () => {
     let isValid = false;
     if (step === 1) {
-      isValid = await trigger(["firstName", "lastName", "farmName", "latitude", "longitude"]);
+      isValid = await trigger(["email", "password", "confirmPassword", "firstName", "lastName", "farmName", "latitude", "longitude"]);
     } else if (step === 2) {
       isValid = await trigger(["unitSystem", "timezone", "currency"]);
     }
@@ -60,10 +66,32 @@ export function StepWizardForm() {
   };
 
   const onSubmit = async (data: OnboardingFormData) => {
-    // Send data to API service mock or backend endpoint
-    console.log("Submitting Onboarding Data:", data);
-    // Navigate to dashboard home after success
-    router.push("/dashboard");
+    setSubmitError(null);
+    setSubmitting(true);
+    try {
+      // 1. Register the user (creates account + stores token)
+      await registerUser({
+        name: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        password: data.password,
+        password_confirmation: data.confirmPassword,
+      });
+      // 2. Submit the farm profile (authenticated via stored token)
+      await submitOnboarding(data);
+      // 3. Redirect to dashboard
+      router.push("/dashboard");
+    } catch (err: any) {
+      const emailError = err?.response?.data?.errors?.email?.[0];
+      if (emailError) {
+        // Duplicate email — jump back to Step 1 and show the error on the field
+        setStep(1);
+        setError("email", { message: emailError });
+      } else {
+        setSubmitError(err?.response?.data?.message || "Registration failed. Please try again.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -99,7 +127,47 @@ export function StepWizardForm() {
         {/* STEP 1: Farm Information & GIS Spatial Viewport */}
         {step === 1 && (
           <div className="space-y-2 p-1">
-            <h2 className="text-xl font-bold text-gray-800">Tell us about your farm</h2>
+            <h2 className="text-xl font-bold text-gray-800">Create your account</h2>
+
+            {/* ── Account Credentials ── */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <input
+                {...register("email")}
+                type="email"
+                placeholder="you@example.com"
+                className="w-full border rounded-md p-2 mt-1 bg-white/70 text-sm"
+              />
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Password</label>
+                <input
+                  {...register("password")}
+                  type="password"
+                  placeholder="Min. 6 characters"
+                  className="w-full border rounded-md p-2 mt-1 bg-white/70 text-sm"
+                />
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
+                <input
+                  {...register("confirmPassword")}
+                  type="password"
+                  placeholder="Repeat password"
+                  className="w-full border rounded-md p-2 mt-1 bg-white/70 text-sm"
+                />
+                {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
+              </div>
+            </div>
+
+            <div className="border-t border-gray-200 pt-3">
+              <h3 className="text-sm font-semibold text-gray-600 mb-2">Tell us about your farm</h3>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">First Name</label>
@@ -234,33 +302,41 @@ export function StepWizardForm() {
         )}
 
         {/* Action Controls */}
-        <div className="flex justify-between pt-4 border-t border-gray-200">
-          {step > 1 && (
-            <button
-              type="button"
-              onClick={() => setStep((prev) => (prev - 1) as 1 | 2)}
-              className="px-4 py-2 bg-[#f3f4f644] text-gray-700 rounded-md font-medium hover:bg-gray-200/50 transition"
-            >
-              Previous
-            </button>
+        <div className="space-y-2">
+          {submitError && (
+            <div className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-md px-3 py-2">
+              {submitError}
+            </div>
           )}
+          <div className="flex justify-between pt-4 border-t border-gray-200">
+            {step > 1 && (
+              <button
+                type="button"
+                onClick={() => setStep((prev) => (prev - 1) as 1 | 2)}
+                className="px-4 py-2 bg-[#f3f4f644] text-gray-700 rounded-md font-medium hover:bg-gray-200/50 transition"
+              >
+                Previous
+              </button>
+            )}
 
-          {step < 3 ? (
-            <button
-              type="button"
-              onClick={handleNextStep}
-              className="ml-auto px-6 py-2 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 transition"
-            >
-              Next
-            </button>
-          ) : (
-            <button
-              type="submit"
-              className="ml-auto px-6 py-2 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 transition shadow-md"
-            >
-              Finish Setup
-            </button>
-          )}
+            {step < 3 ? (
+              <button
+                type="button"
+                onClick={handleNextStep}
+                className="ml-auto px-6 py-2 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 transition"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={submitting}
+                className="ml-auto px-6 py-2 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 transition shadow-md disabled:opacity-60"
+              >
+                {submitting ? "Setting up…" : "Finish Setup"}
+              </button>
+            )}
+          </div>
         </div>
       </form>
     </div>

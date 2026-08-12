@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -11,7 +12,7 @@ import {
   Store,
   BeefIcon,
 } from "lucide-react";
-import animals from "@/app/(dashboard)/livestock/[id]/page";
+
 
 interface SubItem {
   name: string;
@@ -110,11 +111,10 @@ export function Sidebar() {
               <button
                 type="button"
                 onClick={() => toggleSection(section.key)}
-                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-mono rounded-md transition-colors ${
-                  isSectionActive
+                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-mono rounded-md transition-colors ${isSectionActive
                     ? "text-gray-900 font-semibold"
                     : "text-gray-700 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 <div className="font-mono flex items-center gap-3">
                   <Icon className="w-4 h-4 text-gray-500" />
@@ -136,11 +136,10 @@ export function Sidebar() {
                       <Link
                         key={subItem.href}
                         href={subItem.href}
-                        className={`block px-3 py-1.5 text-xs rounded-md transition-colors ${
-                          isSubActive
+                        className={`block px-3 py-1.5 text-xs rounded-md transition-colors ${isSubActive
                             ? "bg-gray-200/80 text-gray-900 font-mono"
                             : "text-gray-600 hover:bg-gray-100"
-                        }`}
+                          }`}
                       >
                         {subItem.name}
                       </Link>

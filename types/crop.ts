@@ -1,12 +1,13 @@
 export interface Crop {
 
-  id?: string;
-
-
+  id: number;
+  userId?: number;
 
   // --- Type & Variety ---
 
   cropType: string;             
+
+  status?: string;              // 'Active' | 'For Sale' | 'Sold' | 'Archived'
 
   varietyStrain?: string;       // optional
 

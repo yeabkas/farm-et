@@ -1,19 +1,20 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import { MoreVertical, Edit3, DollarSign, Copy, Trash2 } from "lucide-react";
 
 // Generic interface where T represents any entity (Animal, Crop, etc.)
-interface ActionDropdownProps<T extends { id?: string }> {
+interface ActionDropdownProps<T extends { id?: string | number }> {
   item: T;
   itemLabel?: string; // Optional label for text (e.g., "Animal", "Crop")
   onEdit?: (item: T) => void;
   onSell?: (item: T) => void;
   onDuplicate?: (item: T) => void;
-  onDelete?: (itemId: string) => void;
+  onDelete?: (itemId: string | number) => void;
 }
 
-export function ActionDropdown<T extends { id?: string }>({
+export function ActionDropdown<T extends { id?: string | number }>({
   item,
   itemLabel = "Item",
   onEdit,

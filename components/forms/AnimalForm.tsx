@@ -43,8 +43,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const createAnimalObject = (): Animal => ({
-    id: initialData?.id || Date.now().toString(),
+  const createAnimalObject = () => ({
+    id: initialData?.id ?? 0,
     ...formData,
   });
 
@@ -97,6 +97,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
             <div className="flex items-center">
               <label className="w-40 text-sm font-mono text-gray-700">Breed</label>
               <input
+
                 type="text"
                 name="breed"
                 placeholder="Breed"
