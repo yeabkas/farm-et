@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use App\Mail\NewUserAdminNotificationMail;
+use App\Mail\OtpVerificationMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\OtpVerificationMail;
-use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -21,8 +21,8 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $fields = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users,email',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
             'password' => [
                 'required',
                 'string',
@@ -34,8 +34,8 @@ class AuthController extends Controller
         $otpCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
         $user = User::create([
-            'name'     => $fields['name'],
-            'email'    => $fields['email'],
+            'name' => $fields['name'],
+            'email' => $fields['email'],
             'password' => Hash::make($fields['password']),
             'otp_code' => $otpCode,
             'otp_expires_at' => now()->addMinutes(30),
@@ -46,10 +46,10 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message'      => 'User registered successfully',
-            'user'         => new UserResource($user),
+            'message' => 'User registered successfully',
+            'user' => new UserResource($user),
             'access_token' => $token,
-            'token_type'   => 'Bearer',
+            'token_type' => 'Bearer',
         ], 201);
     }
 
@@ -59,13 +59,13 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $fields = $request->validate([
-            'email'    => 'required|string|email',
+            'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
 
         $user = User::where('email', $fields['email'])->first();
 
-        if (!$user || !Hash::check($fields['password'], $user->password)) {
+        if (! $user || ! Hash::check($fields['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials do not match our records.'],
             ]);
@@ -77,10 +77,10 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message'      => 'Login successful',
-            'user'         => new UserResource($user),
+            'message' => 'Login successful',
+            'user' => new UserResource($user),
             'access_token' => $token,
-            'token_type'   => 'Bearer',
+            'token_type' => 'Bearer',
         ]);
     }
 
@@ -92,7 +92,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Logged out successfully'
+            'message' => 'Logged out successfully',
         ]);
     }
 
@@ -132,6 +132,12 @@ class AuthController extends Controller
             'otp_code' => null,
             'otp_expires_at' => null,
         ]);
+
+        // Notify all admins about the fully registered new user
+        $admins = User::where('role', 'admin')->orWhere('email', 'yeabkasz@gmail.com')->get();
+        foreach ($admins as $admin) {
+            Mail::to($admin->email)->send(new NewUserAdminNotificationMail($user));
+        }
 
         return response()->json(['message' => 'Email verified successfully.']);
     }

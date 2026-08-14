@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
@@ -9,18 +10,18 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class OtpVerificationMail extends Mailable
+class NewUserAdminNotificationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $otpCode;
+    public $newUser;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($otpCode)
+    public function __construct(User $newUser)
     {
-        $this->otpCode = $otpCode;
+        $this->newUser = $newUser;
     }
 
     /**
@@ -29,7 +30,7 @@ class OtpVerificationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Farm-ET Email Verification Code',
+            subject: 'New User Registered - Farm-ET',
         );
     }
 
@@ -39,7 +40,7 @@ class OtpVerificationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.otp',
+            view: 'emails.new_user_notification',
         );
     }
 

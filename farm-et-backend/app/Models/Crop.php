@@ -28,10 +28,10 @@ class Crop extends Model
     protected function casts(): array
     {
         return [
-            'is_perennial'     => 'boolean',
+            'is_perennial' => 'boolean',
             'days_to_maturity' => 'integer',
-            'sale_window'      => 'integer',
-            'estimated_value'  => 'float',
+            'sale_window' => 'integer',
+            'estimated_value' => 'float',
         ];
     }
 

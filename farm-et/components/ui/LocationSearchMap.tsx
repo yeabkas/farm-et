@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, MapPin, Navigation, Loader2, X, Check } from "lucide-react";
 import { GoogleMapView } from "./GoogleMapView";
 
@@ -44,8 +44,10 @@ export function LocationSearchMap({
   // Debounced search using OpenStreetMap Nominatim API (Free, global & Ethiopian coverage)
   useEffect(() => {
     if (!searchQuery.trim() || searchQuery.length < 2) {
-      setSuggestions([]);
-      setIsSearching(false);
+      setTimeout(() => {
+        setSuggestions([]);
+        setIsSearching(false);
+      }, 0);
       return;
     }
 

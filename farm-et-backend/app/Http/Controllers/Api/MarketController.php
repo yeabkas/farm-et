@@ -25,22 +25,22 @@ class MarketController extends Controller
                 $profile = $animal->user?->farmProfile;
 
                 return [
-                    'id'             => $animal->id,
-                    'listingType'    => 'animal',
-                    'name'           => $animal->name,
-                    'category'       => $animal->animal_type,
-                    'breed'          => $animal->breed,
-                    'sex'            => $animal->sex,
-                    'age'            => $animal->age,
-                    'description'    => $animal->description,
+                    'id' => $animal->id,
+                    'listingType' => 'animal',
+                    'name' => $animal->name,
+                    'category' => $animal->animal_type,
+                    'breed' => $animal->breed,
+                    'sex' => $animal->sex,
+                    'age' => $animal->age,
+                    'description' => $animal->description,
                     'estimatedValue' => $animal->estimated_value,
-                    'harvestUnits'   => null,
-                    'matureWeight'   => $animal->mature_weight,
-                    'sellerName'     => $profile
-                        ? trim(($profile->first_name ?? '') . ' ' . ($profile->last_name ?? ''))
+                    'harvestUnits' => null,
+                    'matureWeight' => $animal->mature_weight,
+                    'sellerName' => $profile
+                        ? trim(($profile->first_name ?? '').' '.($profile->last_name ?? ''))
                         : ($animal->user?->name ?? 'Unknown'),
-                    'farmName'       => $profile?->farm_name ?? 'Unknown Farm',
-                    'createdAt'      => $animal->created_at?->toDateString(),
+                    'farmName' => $profile?->farm_name ?? 'Unknown Farm',
+                    'createdAt' => $animal->created_at?->toDateString(),
                 ];
             });
 
@@ -52,22 +52,22 @@ class MarketController extends Controller
                 $profile = $crop->user?->farmProfile;
 
                 return [
-                    'id'             => $crop->id,
-                    'listingType'    => 'crop',
-                    'name'           => $crop->crop_type,
-                    'category'       => $crop->variety_strain ?? $crop->crop_type,
-                    'breed'          => null,
-                    'sex'            => null,
-                    'age'            => null,
-                    'description'    => $crop->description,
+                    'id' => $crop->id,
+                    'listingType' => 'crop',
+                    'name' => $crop->crop_type,
+                    'category' => $crop->variety_strain ?? $crop->crop_type,
+                    'breed' => null,
+                    'sex' => null,
+                    'age' => null,
+                    'description' => $crop->description,
                     'estimatedValue' => $crop->estimated_value,
-                    'harvestUnits'   => $crop->harvest_units,
-                    'matureWeight'   => null,
-                    'sellerName'     => $profile
-                        ? trim(($profile->first_name ?? '') . ' ' . ($profile->last_name ?? ''))
+                    'harvestUnits' => $crop->harvest_units,
+                    'matureWeight' => null,
+                    'sellerName' => $profile
+                        ? trim(($profile->first_name ?? '').' '.($profile->last_name ?? ''))
                         : ($crop->user?->name ?? 'Unknown'),
-                    'farmName'       => $profile?->farm_name ?? 'Unknown Farm',
-                    'createdAt'      => $crop->created_at?->toDateString(),
+                    'farmName' => $profile?->farm_name ?? 'Unknown Farm',
+                    'createdAt' => $crop->created_at?->toDateString(),
                 ];
             });
 
@@ -77,7 +77,7 @@ class MarketController extends Controller
             ->values();
 
         return response()->json([
-            'data'  => $listings,
+            'data' => $listings,
             'total' => $listings->count(),
         ]);
     }

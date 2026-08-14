@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { fetchMarketListings } from "@/lib/services";
-import { Search, SlidersHorizontal, Tag, MapPin, Package, ChevronDown, X, ShoppingBag } from "lucide-react";
+import { Search, SlidersHorizontal, Tag, MapPin, Package, X, ShoppingBag } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

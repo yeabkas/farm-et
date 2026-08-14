@@ -22,7 +22,7 @@ class ReportController extends Controller
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $request->validate([
                 'start_date' => 'date',
-                'end_date'   => 'date|after_or_equal:start_date',
+                'end_date' => 'date|after_or_equal:start_date',
             ]);
             $query->whereBetween('date', [$request->start_date, $request->end_date]);
         } else {
@@ -30,9 +30,9 @@ class ReportController extends Controller
             $query->where('reporting_year', $year);
         }
 
-        $totalIncome  = (clone $query)->where('type', 'Income')->sum('amount');
+        $totalIncome = (clone $query)->where('type', 'Income')->sum('amount');
         $totalExpense = (clone $query)->where('type', 'Expense')->sum('amount');
-        $netIncome    = $totalIncome - $totalExpense;
+        $netIncome = $totalIncome - $totalExpense;
 
         // Breakdown by category for charts
         $expensesByCategory = (clone $query)
@@ -50,15 +50,15 @@ class ReportController extends Controller
         return response()->json([
             'filters' => [
                 'start_date' => $request->start_date ?? null,
-                'end_date'   => $request->end_date   ?? null,
-                'year'       => $request->query('year', date('Y')),
+                'end_date' => $request->end_date ?? null,
+                'year' => $request->query('year', date('Y')),
             ],
             'summary' => [
-                'total_income'  => round($totalIncome, 2),
+                'total_income' => round($totalIncome, 2),
                 'total_expense' => round($totalExpense, 2),
-                'net_income'    => round($netIncome, 2),
+                'net_income' => round($netIncome, 2),
             ],
-            'income_by_category'   => $incomeByCategory,
+            'income_by_category' => $incomeByCategory,
             'expenses_by_category' => $expensesByCategory,
         ]);
     }
@@ -81,7 +81,7 @@ class ReportController extends Controller
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $request->validate([
                 'start_date' => 'date',
-                'end_date'   => 'date|after_or_equal:start_date',
+                'end_date' => 'date|after_or_equal:start_date',
             ]);
             $query->whereBetween('date', [$request->start_date, $request->end_date]);
         } else {
@@ -103,27 +103,27 @@ class ReportController extends Controller
             ->groupBy('category')
             ->get();
 
-        $totalInflow       = $operatingInflows->sum('total');
+        $totalInflow = $operatingInflows->sum('total');
         $totalExpenditures = $cashExpenditures->sum('total');
 
         // Beginning balance: 0.00 until a balance-sheet module is introduced
-        $beginningBalance  = 0.00;
-        $netChangeInCash   = $totalInflow - $totalExpenditures;
-        $endingBalance     = $beginningBalance + $netChangeInCash;
+        $beginningBalance = 0.00;
+        $netChangeInCash = $totalInflow - $totalExpenditures;
+        $endingBalance = $beginningBalance + $netChangeInCash;
 
         return response()->json([
             'filters' => [
                 'start_date' => $request->start_date ?? null,
-                'end_date'   => $request->end_date   ?? null,
-                'year'       => $request->query('year', date('Y')),
+                'end_date' => $request->end_date ?? null,
+                'year' => $request->query('year', date('Y')),
             ],
-            'beginning_balance'  => round($beginningBalance, 2),
-            'operating_inflows'  => $operatingInflows,
-            'cash_expenditures'  => $cashExpenditures,
-            'total_inflow'       => round($totalInflow, 2),
+            'beginning_balance' => round($beginningBalance, 2),
+            'operating_inflows' => $operatingInflows,
+            'cash_expenditures' => $cashExpenditures,
+            'total_inflow' => round($totalInflow, 2),
             'total_expenditures' => round($totalExpenditures, 2),
             'net_change_in_cash' => round($netChangeInCash, 2),
-            'ending_balance'     => round($endingBalance, 2),
+            'ending_balance' => round($endingBalance, 2),
         ]);
     }
 }

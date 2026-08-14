@@ -46,9 +46,30 @@ classDiagram
         +number id
         +string name
         +string email
+        +string role
+        +string otp_code
+        +string otp_expires_at
         +string email_verified_at
         +string created_at
         +string updated_at
+    }
+
+    class AdminUserSummary {
+        +number id
+        +string name
+        +string email
+        +string farmName
+        +string role
+        +number totalTransactions
+        +number forSaleCount
+        +string createdAt
+    }
+
+    class UserDetailPayload {
+        +User user
+        +Transaction[] recentTransactions
+        +Crop[] recentCrops
+        +Animal[] recentAnimals
     }
 
     class FarmProfile {
@@ -67,48 +88,58 @@ classDiagram
     }
 
     class Animal {
-        +string id
+        +number id
+        +number user_id
         +string name
-        +string animalType
+        +string animal_type
         +string breed
         +string sex
-        +string age
+        +number age
         +string status
         +string neutered
         +string coloring
         +string description
-        +string methodAcquired
+        +string method_acquired
         +string veterinarian
-        +string matureWeight
-        +string estimatedValue
+        +number mature_weight
+        +number estimated_value
+        +string created_at
+        +string updated_at
     }
 
     class Crop {
-        +string id
-        +string cropType
-        +string varietyStrain
-        +string botanicalName
+        +number id
+        +number user_id
+        +string crop_type
+        +string status
+        +string variety_strain
+        +string botanical_name
         +string description
-        +number saleWindow
-        +string internalId
-        +number daysToMaturity
-        +string harvestUnits
-        +number estimatedValue
-        +boolean isPerennial
+        +string internal_id
+        +number days_to_maturity
+        +boolean is_perennial
+        +string harvest_units
+        +number sale_window
+        +number estimated_value
+        +string created_at
+        +string updated_at
     }
 
     class Transaction {
-        +string id
+        +number id
+        +number user_id
         +TransactionType type
         +number amount
-        +string payeeCustomer
+        +string payee_customer
         +string category
         +string date
-        +string reportingYear
-        +string checkNumber
-        +string associatedTo
-        +string keywords
+        +string reporting_year
         +string description
+        +string check_number
+        +string associated_to
+        +string keywords
+        +string created_at
+        +string updated_at
     }
 
     class TransactionType {
@@ -124,6 +155,16 @@ classDiagram
         +loginUser(credentials) AuthResponse
         +logoutUser() void
         +fetchUserProfile() User
+        +verifyEmail(data) void
+        +resendOtp() void
+    }
+
+    class AdminService {
+        +fetchAdminUsers() AdminUserSummary[]
+        +fetchAdminUserDetails(id) UserDetailPayload
+        +createAdminUser(data) void
+        +revokeAdminRole(id) void
+        +promoteAdminRole(id) void
     }
 
     class OnboardingService {
@@ -180,6 +221,8 @@ classDiagram
     TransactionService ..> Transaction       : manages
     LivestockService   ..> Animal            : manages
     CropService        ..> Crop              : manages
+    AdminService       ..> AdminUserSummary  : returns
+    AdminService       ..> UserDetailPayload : returns
 
     onboardingSchema ..> OnboardingFormData : infers
 ```

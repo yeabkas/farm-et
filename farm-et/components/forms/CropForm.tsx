@@ -40,7 +40,8 @@ const defaultFormState: CropFormState = {
 export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
   const [formData, setFormData] = useState<CropFormState>(() => {
     if (initialData) {
-      const { id, harvestUnits, status, ...rest } = initialData;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id: _, harvestUnits, status, ...rest } = initialData;
       return {
         ...rest,
         status: status ?? "Active",

@@ -26,21 +26,21 @@ class CropController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'cropType'       => 'required|string|max:100',
-            'status'         => 'nullable|string|in:Active,For Sale,Sold,Archived',
-            'varietyStrain'  => 'nullable|string|max:100',
-            'botanicalName'  => 'nullable|string|max:255',
-            'description'    => 'nullable|string',
-            'internalId'     => 'nullable|string|max:50',
+            'cropType' => 'required|string|max:100',
+            'status' => 'nullable|string|in:Active,For Sale,Sold,Archived',
+            'varietyStrain' => 'nullable|string|max:100',
+            'botanicalName' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'internalId' => 'nullable|string|max:50',
             'daysToMaturity' => 'nullable|integer|min:0',
-            'isPerennial'    => 'boolean',
-            'harvestUnits'   => 'required|string|max:50',
-            'saleWindow'     => 'nullable|integer|min:0',
+            'isPerennial' => 'boolean',
+            'harvestUnits' => 'required|string|max:50',
+            'saleWindow' => 'nullable|integer|min:0',
             'estimatedValue' => 'nullable|numeric|min:0',
         ]);
 
         // Set default status if not provided
-        if (!isset($validated['status'])) {
+        if (! isset($validated['status'])) {
             $validated['status'] = 'Active';
         }
 
@@ -75,16 +75,16 @@ class CropController extends Controller
         }
 
         $validated = $request->validate([
-            'cropType'       => 'sometimes|string|max:100',
-            'status'         => 'nullable|string|in:Active,For Sale,Sold,Archived',
-            'varietyStrain'  => 'nullable|string|max:100',
-            'botanicalName'  => 'nullable|string|max:255',
-            'description'    => 'nullable|string',
-            'internalId'     => 'nullable|string|max:50',
+            'cropType' => 'sometimes|string|max:100',
+            'status' => 'nullable|string|in:Active,For Sale,Sold,Archived',
+            'varietyStrain' => 'nullable|string|max:100',
+            'botanicalName' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'internalId' => 'nullable|string|max:50',
             'daysToMaturity' => 'nullable|integer|min:0',
-            'isPerennial'    => 'boolean',
-            'harvestUnits'   => 'sometimes|string|max:50',
-            'saleWindow'     => 'nullable|integer|min:0',
+            'isPerennial' => 'boolean',
+            'harvestUnits' => 'sometimes|string|max:50',
+            'saleWindow' => 'nullable|integer|min:0',
             'estimatedValue' => 'nullable|numeric|min:0',
         ]);
 

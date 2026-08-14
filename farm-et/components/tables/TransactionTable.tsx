@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Transaction } from "@/types/transaction";
 import { ActionDropdown } from "@/components/ui/Dropdown";
 

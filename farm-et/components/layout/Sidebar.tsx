@@ -100,7 +100,8 @@ export function Sidebar() {
   }, []);
 
   // Safely extract role, considering possible Laravel resource wrapper
-  const role = (currentUser as any)?.data?.role || (currentUser as any)?.role;
+  type CurrentUserType = { data?: { role?: string }; role?: string } | null;
+  const role = (currentUser as CurrentUserType)?.data?.role || (currentUser as CurrentUserType)?.role;
 
   // Build nav sections based on user role
   const navSections = role === "admin"

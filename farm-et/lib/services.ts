@@ -127,4 +127,24 @@ export const fetchAdminUserDetails = async (userId: number | string) => {
   const response = await api.get(`/admin/users/${userId}`);
   return response.data;
 };
+
+export const createAdminUser = async (data: { name: string; email: string; password: string }) => {
+  const response = await api.post('/admin/users', data);
+  return response.data;
+};
+
+export const revokeAdminRole = async (userId: number | string) => {
+  const response = await api.put(`/admin/users/${userId}/revoke`);
+  return response.data;
+};
+
+export const promoteAdminRole = async (userId: number | string) => {
+  const response = await api.put(`/admin/users/${userId}/promote`);
+  return response.data;
+};
+
+export const resetUserPassword = async (userId: number | string, password: string) => {
+  const response = await api.put(`/admin/users/${userId}/reset-password`, { password });
+  return response.data;
+};
 

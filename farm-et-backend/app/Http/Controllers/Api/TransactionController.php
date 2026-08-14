@@ -26,16 +26,16 @@ class TransactionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'type'          => 'required|in:Income,Expense',
-            'amount'        => 'required|numeric|gt:0',
+            'type' => 'required|in:Income,Expense',
+            'amount' => 'required|numeric|gt:0',
             'payeeCustomer' => 'nullable|string|max:255',
-            'category'      => 'required|string|max:255',
-            'date'          => 'required|date',
+            'category' => 'required|string|max:255',
+            'date' => 'required|date',
             'reportingYear' => 'required|integer|digits:4',
-            'description'   => 'nullable|string',
-            'checkNumber'   => 'nullable|string|max:50',
-            'associatedTo'  => 'nullable|string|max:255',
-            'keywords'      => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'checkNumber' => 'nullable|string|max:50',
+            'associatedTo' => 'nullable|string|max:255',
+            'keywords' => 'nullable|string|max:255',
         ]);
 
         $snake = collect($validated)->mapWithKeys(
@@ -69,16 +69,16 @@ class TransactionController extends Controller
         }
 
         $validated = $request->validate([
-            'type'          => 'sometimes|in:Income,Expense',
-            'amount'        => 'sometimes|numeric|gt:0',
+            'type' => 'sometimes|in:Income,Expense',
+            'amount' => 'sometimes|numeric|gt:0',
             'payeeCustomer' => 'nullable|string|max:255',
-            'category'      => 'sometimes|string|max:255',
-            'date'          => 'sometimes|date',
+            'category' => 'sometimes|string|max:255',
+            'date' => 'sometimes|date',
             'reportingYear' => 'sometimes|integer|digits:4',
-            'description'   => 'nullable|string',
-            'checkNumber'   => 'nullable|string|max:50',
-            'associatedTo'  => 'nullable|string|max:255',
-            'keywords'      => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'checkNumber' => 'nullable|string|max:50',
+            'associatedTo' => 'nullable|string|max:255',
+            'keywords' => 'nullable|string|max:255',
         ]);
 
         $snake = collect($validated)->mapWithKeys(

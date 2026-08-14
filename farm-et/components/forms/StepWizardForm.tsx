@@ -78,7 +78,8 @@ export function StepWizardForm() {
           });
           setIsRegistered(true);
           setStep(3);
-        } catch (err: any) {
+        } catch (error) {
+          const err = error as { response?: { data?: { message?: string; errors?: { email?: string[] } } } };
           const emailError = err?.response?.data?.errors?.email?.[0];
           if (emailError) {
             setStep(1);
@@ -112,7 +113,8 @@ export function StepWizardForm() {
       
       // 3. Redirect to dashboard
       router.push("/dashboard");
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
       setSubmitError(err?.response?.data?.message || "Verification failed. Please try again.");
     } finally {
       setSubmitting(false);
@@ -125,7 +127,8 @@ export function StepWizardForm() {
     try {
       await resendVerificationOtp();
       alert("Verification code resent successfully!");
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
       setSubmitError(err?.response?.data?.message || "Failed to resend code.");
     } finally {
       setResending(false);
@@ -318,7 +321,7 @@ export function StepWizardForm() {
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-bold text-gray-800">Verify Your Email 📩</h2>
               <p className="text-gray-600 text-sm">
-                We've sent a 6-digit verification code to <span className="font-semibold">{formData.email}</span>. Please enter it below to complete setup.
+                We&apos;ve sent a 6-digit verification code to <span className="font-semibold">{formData.email}</span>. Please enter it below to complete setup.
               </p>
             </div>
 

@@ -28,7 +28,8 @@ const defaultFormState = {
 export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps) {
   const [formData, setFormData] = useState<Omit<Animal, "id">>(() => {
     if (initialData) {
-      const { id, ...rest } = initialData;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id: _, ...rest } = initialData;
       return {
         name: rest.name ?? "",
         animalType: rest.animalType ?? "Cattle",

@@ -30,8 +30,8 @@ class Animal extends Model
     protected function casts(): array
     {
         return [
-            'age'             => 'float',
-            'mature_weight'   => 'float',
+            'age' => 'float',
+            'mature_weight' => 'float',
             'estimated_value' => 'float',
         ];
     }

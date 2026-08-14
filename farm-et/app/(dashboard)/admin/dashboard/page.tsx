@@ -16,8 +16,11 @@ import {
   RefreshCw,
   Eye,
   CheckCircle,
+  UserPlus,
+  UserMinus,
+  ShieldAlert
 } from "lucide-react";
-import { fetchUserProfile, fetchAdminUsers, fetchAdminUserDetails } from "@/lib/services";
+import { fetchUserProfile, fetchAdminUsers, fetchAdminUserDetails, createAdminUser, revokeAdminRole, promoteAdminRole, resetUserPassword } from "@/lib/services";
 
 interface AdminUserSummary {
   id: number;
@@ -68,7 +71,7 @@ interface UserDetailPayload {
 
 export default function AdminDashboardPage() {
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<{ email?: string; role?: string; data?: { role?: string, email?: string } } | null>(null);
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<AdminUserSummary[]>([]);
@@ -84,6 +87,19 @@ export default function AdminDashboardPage() {
   const [inspecting, setInspecting] = useState(false);
   const [inspectData, setInspectData] = useState<UserDetailPayload | null>(null);
   const [activeTab, setActiveTab] = useState<"transactions" | "forSale">("transactions");
+
+  // Add Admin modal state
+  const [isAddingAdmin, setIsAddingAdmin] = useState(false);
+  const [addAdminForm, setAddAdminForm] = useState({ name: "", email: "", password: "" });
+  const [isAdding, setIsAdding] = useState(false);
+  const [addAdminError, setAddAdminError] = useState("");
+
+  // Reset password state
+  const [resetUserId, setResetUserId] = useState<number | null>(null);
+  const [resetPasswordInput, setResetPasswordInput] = useState("");
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetError, setResetError] = useState("");
+
   const loadAdminData = async () => {
     setLoading(true);
     try {
@@ -128,10 +144,68 @@ export default function AdminDashboardPage() {
     try {
       const data = await fetchAdminUserDetails(userId);
       setInspectData(data);
-    } catch (err) {
-      console.error("Failed to fetch user details:", err);
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
+      alert(err.response?.data?.message || "Failed to fetch user details.");
     } finally {
       setInspecting(false);
+    }
+  };
+
+  const handleRevokeAdmin = async (userId: number) => {
+    if (!confirm("Are you sure you want to revoke this user's admin privileges?")) return;
+    try {
+      await revokeAdminRole(userId);
+      loadAdminData();
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
+      alert(err.response?.data?.message || "Failed to revoke admin privileges.");
+    }
+  };
+
+  const handlePromoteAdmin = async (userId: number) => {
+    if (!confirm("Are you sure you want to promote this user to admin?")) return;
+    try {
+      await promoteAdminRole(userId);
+      loadAdminData();
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
+      alert(err.response?.data?.message || "Failed to promote user to admin.");
+    }
+  };
+
+  const handleResetPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetUserId) return;
+    setResetError("");
+    setIsResetting(true);
+    try {
+      await resetUserPassword(resetUserId, resetPasswordInput);
+      setResetUserId(null);
+      setResetPasswordInput("");
+      alert("Password reset successfully.");
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
+      setResetError(err.response?.data?.message || "Failed to reset password.");
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  const handleAddAdminSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddAdminError("");
+    setIsAdding(true);
+    try {
+      await createAdminUser(addAdminForm);
+      setIsAddingAdmin(false);
+      setAddAdminForm({ name: "", email: "", password: "" });
+      loadAdminData(); // Refresh directory
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
+      setAddAdminError(err.response?.data?.message || "Failed to create admin account.");
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -184,14 +258,23 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        <button
-          onClick={loadAdminData}
-          disabled={loading}
-          className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-xs transition border border-white/10 self-start sm:self-auto"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-          <span>Refresh System Data</span>
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 self-start sm:self-auto">
+          <button
+            onClick={() => setIsAddingAdmin(true)}
+            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Add Admin</span>
+          </button>
+          <button
+            onClick={loadAdminData}
+            disabled={loading}
+            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-xs transition border border-white/10"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            <span>Refresh System Data</span>
+          </button>
+        </div>
       </div>
 
       {/* ── Summary Cards ── */}
@@ -311,14 +394,55 @@ export default function AdminDashboardPage() {
                       </span>
                     </td>
                     <td className="p-3 text-gray-500">{user.createdAt}</td>
-                    <td className="p-3 text-right">
-                      <button
-                        onClick={() => handleInspectUser(user.id)}
-                        className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-xs"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Inspect</span>
-                      </button>
+                    <td className="px-4 py-3 whitespace-nowrap text-right text-xs">
+                      <div className="flex justify-end gap-2">
+                        {currentUser?.email === "yeabkasz@gmail.com" &&
+                         user.role === "admin" &&
+                         user.email !== "yeabkasz@gmail.com" && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRevokeAdmin(user.id);
+                            }}
+                            className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg transition"
+                            title="Revoke Admin Privileges"
+                          >
+                            <UserMinus className="w-4 h-4" />
+                          </button>
+                        )}
+                        {currentUser?.email === "yeabkasz@gmail.com" &&
+                         user.role !== "admin" && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePromoteAdmin(user.id);
+                            }}
+                            className="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-1.5 rounded-lg transition"
+                            title="Promote to Admin"
+                          >
+                            <ShieldAlert className="w-4 h-4" />
+                          </button>
+                        )}
+                        {currentUser?.email === "yeabkasz@gmail.com" && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setResetUserId(user.id);
+                            }}
+                            className="text-amber-500 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 p-1.5 rounded-lg transition"
+                            title="Reset Password"
+                          >
+                            <Lock className="w-4 h-4" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleInspectUser(user.id)}
+                          className="text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 p-1.5 rounded-lg transition flex items-center gap-1"
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span>Inspect</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -504,6 +628,139 @@ export default function AdminDashboardPage() {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      )}
+      {/* ── Add Admin Modal ── */}
+      {isAddingAdmin && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-sm flex flex-col overflow-hidden">
+            <div className="p-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                <UserPlus className="w-4 h-4 text-emerald-600" />
+                Add Platform Admin
+              </h3>
+              <button
+                onClick={() => {
+                  setIsAddingAdmin(false);
+                  setAddAdminForm({ name: "", email: "", password: "" });
+                  setAddAdminError("");
+                }}
+                className="p-1 text-gray-400 hover:text-gray-600 rounded-lg transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleAddAdminSubmit} className="p-6 space-y-4">
+              {addAdminError && (
+                <div className="bg-red-50 text-red-600 text-xs p-3 rounded-lg border border-red-200">
+                  {addAdminError}
+                </div>
+              )}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-700">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={addAdminForm.name}
+                  onChange={(e) => setAddAdminForm({ ...addAdminForm, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  placeholder="e.g. Admin User"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-700">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={addAdminForm.email}
+                  onChange={(e) => setAddAdminForm({ ...addAdminForm, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  placeholder="admin@example.com"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-700">Password</label>
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={addAdminForm.password}
+                  onChange={(e) => setAddAdminForm({ ...addAdminForm, password: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  placeholder="••••••••"
+                />
+              </div>
+              
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isAdding}
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition disabled:opacity-50"
+                >
+                  {isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                  <span>{isAdding ? "Creating..." : "Create Admin Account"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Password Modal */}
+      {resetUserId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900">Reset User Password</h2>
+              <button
+                onClick={() => setResetUserId(null)}
+                className="text-gray-400 hover:text-gray-600 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              {resetError && (
+                <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm border border-red-100">
+                  {resetError}
+                </div>
+              )}
+              <form onSubmit={handleResetPasswordSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    minLength={8}
+                    className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    placeholder="Enter new password"
+                    value={resetPasswordInput}
+                    onChange={(e) => setResetPasswordInput(e.target.value)}
+                  />
+                </div>
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setResetUserId(null)}
+                    className="px-4 py-2 font-semibold text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isResetting}
+                    className="px-4 py-2 font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition disabled:opacity-70 flex items-center gap-2"
+                  >
+                    {isResetting && <Loader2 className="w-4 h-4 animate-spin" />}
+                    Confirm Reset
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

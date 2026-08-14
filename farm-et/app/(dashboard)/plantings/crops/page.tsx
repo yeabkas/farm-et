@@ -33,7 +33,8 @@ export default function CropsPage() {
       const response = await api.get("/crops");
       const items = response.data?.data ?? response.data;
       setCrops(Array.isArray(items) ? items : []);
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as { response?: { status?: number } };
       const status = err?.response?.status;
       if (status === 401) {
         setError("You are not logged in. Please log in to view your crops.");
@@ -47,7 +48,10 @@ export default function CropsPage() {
   }, []);
 
   useEffect(() => {
-    loadCrops();
+    const timer = setTimeout(() => {
+      loadCrops();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [loadCrops]);
 
   const handleOpenAddForm = () => {
@@ -73,7 +77,8 @@ export default function CropsPage() {
       }
       setShowForm(false);
       setEditingCrop(null);
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
       console.error("Failed to save crop:", err?.response?.data ?? err);
       alert("Failed to save crop: " + (err?.response?.data?.message ?? "Please try again."));
     }
@@ -104,8 +109,8 @@ export default function CropsPage() {
       const updated: Crop = res.data?.data ?? res.data;
       setCrops((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
       setToast({ type: "success", message: `${crop.cropType} is now listed For Sale in the Marketplace! 🏷️` });
-    } catch (err: any) {
-      console.error("Failed to mark crop for sale:", err);
+    } catch (error) {
+      console.error("Failed to mark crop for sale:", error);
       setToast({ type: "error", message: "Could not update status. Please try again." });
     }
   };

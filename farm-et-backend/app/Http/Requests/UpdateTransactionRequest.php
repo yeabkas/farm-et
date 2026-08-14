@@ -21,16 +21,16 @@ class UpdateTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type'           => 'sometimes|in:Income,Expense',
-            'amount'         => 'sometimes|numeric|gt:0',
+            'type' => 'sometimes|in:Income,Expense',
+            'amount' => 'sometimes|numeric|gt:0',
             'payee_customer' => 'nullable|string|max:255',
-            'category'       => 'sometimes|string|max:255',
-            'date'           => 'sometimes|date',
+            'category' => 'sometimes|string|max:255',
+            'date' => 'sometimes|date',
             'reporting_year' => 'sometimes|integer|digits:4',
-            'description'    => 'nullable|string',
-            'check_number'   => 'nullable|string|max:50',
-            'associated_to'  => 'nullable|string|max:255',
-            'keywords'       => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'check_number' => 'nullable|string|max:50',
+            'associated_to' => 'nullable|string|max:255',
+            'keywords' => 'nullable|string|max:255',
         ];
     }
 }

@@ -26,18 +26,18 @@ class AnimalController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'           => 'required|string|max:255',
-            'animalType'     => 'required|string|max:100',
-            'breed'          => 'nullable|string|max:100',
-            'sex'            => 'required|in:Male,Female',
-            'age'            => 'nullable|numeric|min:0',
-            'status'         => 'required|in:Active,For Sale,Lactating,Lost,Off Farm,Quarantined,Sold,Weaning',
-            'neutered'       => 'required|in:Neutered,Intact',
-            'coloring'       => 'nullable|string|max:100',
-            'description'    => 'nullable|string',
+            'name' => 'required|string|max:255',
+            'animalType' => 'required|string|max:100',
+            'breed' => 'nullable|string|max:100',
+            'sex' => 'required|in:Male,Female',
+            'age' => 'nullable|numeric|min:0',
+            'status' => 'required|in:Active,For Sale,Lactating,Lost,Off Farm,Quarantined,Sold,Weaning',
+            'neutered' => 'required|in:Neutered,Intact',
+            'coloring' => 'nullable|string|max:100',
+            'description' => 'nullable|string',
             'methodAcquired' => 'nullable|in:Raised on Farm,Purchased,Gifted/Donation',
-            'veterinarian'   => 'nullable|string|max:255',
-            'matureWeight'   => 'nullable|numeric|min:0',
+            'veterinarian' => 'nullable|string|max:255',
+            'matureWeight' => 'nullable|numeric|min:0',
             'estimatedValue' => 'nullable|numeric|min:0',
         ]);
 
@@ -72,18 +72,18 @@ class AnimalController extends Controller
         }
 
         $validated = $request->validate([
-            'name'           => 'sometimes|string|max:255',
-            'animalType'     => 'sometimes|string|max:100',
-            'breed'          => 'nullable|string|max:100',
-            'sex'            => 'sometimes|in:Male,Female',
-            'age'            => 'nullable|numeric|min:0',
-            'status'         => 'sometimes|in:Active,For Sale,Lactating,Lost,Off Farm,Quarantined,Sold,Weaning',
-            'neutered'       => 'sometimes|in:Neutered,Intact',
-            'coloring'       => 'nullable|string|max:100',
-            'description'    => 'nullable|string',
+            'name' => 'sometimes|string|max:255',
+            'animalType' => 'sometimes|string|max:100',
+            'breed' => 'nullable|string|max:100',
+            'sex' => 'sometimes|in:Male,Female',
+            'age' => 'nullable|numeric|min:0',
+            'status' => 'sometimes|in:Active,For Sale,Lactating,Lost,Off Farm,Quarantined,Sold,Weaning',
+            'neutered' => 'sometimes|in:Neutered,Intact',
+            'coloring' => 'nullable|string|max:100',
+            'description' => 'nullable|string',
             'methodAcquired' => 'nullable|in:Raised on Farm,Purchased,Gifted/Donation',
-            'veterinarian'   => 'nullable|string|max:255',
-            'matureWeight'   => 'nullable|numeric|min:0',
+            'veterinarian' => 'nullable|string|max:255',
+            'matureWeight' => 'nullable|numeric|min:0',
             'estimatedValue' => 'nullable|numeric|min:0',
         ]);
 

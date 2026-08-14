@@ -27,7 +27,8 @@ export default function LoginPage() {
       } else {
         router.push('/dashboard');
       }
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
       setError(err.response?.data?.message || 'Invalid credentials');
     } finally {
       setLoading(false);

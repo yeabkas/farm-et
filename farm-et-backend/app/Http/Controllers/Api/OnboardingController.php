@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\FarmProfileResource;
-use App\Models\FarmProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -17,7 +16,7 @@ class OnboardingController extends Controller
     {
         $profile = $request->user()->farmProfile;
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['message' => 'Farm profile not found'], 404);
         }
 
@@ -39,14 +38,14 @@ class OnboardingController extends Controller
         }
 
         $validated = $request->validate([
-            'firstName'  => 'required|string|max:100',
-            'lastName'   => 'required|string|max:100',
-            'farmName'   => 'required|string|max:255',
-            'latitude'   => 'nullable|numeric|min:-90|max:90',
-            'longitude'  => 'nullable|numeric|min:-180|max:180',
+            'firstName' => 'required|string|max:100',
+            'lastName' => 'required|string|max:100',
+            'farmName' => 'required|string|max:255',
+            'latitude' => 'nullable|numeric|min:-90|max:90',
+            'longitude' => 'nullable|numeric|min:-180|max:180',
             'unitSystem' => 'required|in:metric,imperial,us_customary,ethiopian_traditional,mixed',
-            'timezone'   => 'required|string|max:100',
-            'currency'   => 'required|string|size:3',
+            'timezone' => 'required|string|max:100',
+            'currency' => 'required|string|size:3',
         ]);
 
         // Convert camelCase keys to snake_case for Eloquent
@@ -67,7 +66,7 @@ class OnboardingController extends Controller
     {
         $profile = $request->user()->farmProfile;
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(
                 ['message' => 'No farm profile found. Use POST /api/onboarding to create one first.'],
                 404
@@ -75,14 +74,14 @@ class OnboardingController extends Controller
         }
 
         $validated = $request->validate([
-            'firstName'  => 'sometimes|string|max:100',
-            'lastName'   => 'sometimes|string|max:100',
-            'farmName'   => 'sometimes|string|max:255',
-            'latitude'   => 'nullable|numeric|min:-90|max:90',
-            'longitude'  => 'nullable|numeric|min:-180|max:180',
+            'firstName' => 'sometimes|string|max:100',
+            'lastName' => 'sometimes|string|max:100',
+            'farmName' => 'sometimes|string|max:255',
+            'latitude' => 'nullable|numeric|min:-90|max:90',
+            'longitude' => 'nullable|numeric|min:-180|max:180',
             'unitSystem' => 'sometimes|in:metric,imperial,us_customary,ethiopian_traditional,mixed',
-            'timezone'   => 'sometimes|string|max:100',
-            'currency'   => 'sometimes|string|size:3',
+            'timezone' => 'sometimes|string|max:100',
+            'currency' => 'sometimes|string|size:3',
         ]);
 
         $snake = collect($validated)->mapWithKeys(

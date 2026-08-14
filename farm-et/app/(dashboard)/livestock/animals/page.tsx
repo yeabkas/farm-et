@@ -33,7 +33,8 @@ export default function AnimalsPage() {
       const response = await api.get("/animals");
       const items = response.data?.data ?? response.data;
       setAnimals(Array.isArray(items) ? items : []);
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as { response?: { status?: number } };
       const status = err?.response?.status;
       if (status === 401) {
         setError("You are not logged in. Please log in to view your animals.");
@@ -47,7 +48,10 @@ export default function AnimalsPage() {
   }, []);
 
   useEffect(() => {
-    loadAnimals();
+    const timer = setTimeout(() => {
+      loadAnimals();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [loadAnimals]);
 
   const handleOpenAddForm = () => {
@@ -73,7 +77,8 @@ export default function AnimalsPage() {
       }
       setShowForm(false);
       setEditingAnimal(null);
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
       console.error("Failed to save animal:", err?.response?.data ?? err);
       alert("Failed to save animal: " + (err?.response?.data?.message ?? "Please try again."));
     }
@@ -104,8 +109,8 @@ export default function AnimalsPage() {
       const updated: Animal = res.data?.data ?? res.data;
       setAnimals((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
       setToast({ type: "success", message: `${animal.name} is now listed For Sale in the Marketplace! 🏷️` });
-    } catch (err: any) {
-      console.error("Failed to mark animal for sale:", err);
+    } catch (error) {
+      console.error("Failed to mark animal for sale:", error);
       setToast({ type: "error", message: "Could not update status. Please try again." });
     }
   };
