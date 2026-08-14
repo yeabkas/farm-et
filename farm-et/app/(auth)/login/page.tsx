@@ -18,10 +18,15 @@ export default function LoginPage() {
 
     try {
       // loginUser saves the token to localStorage automatically
-      await loginUser({ email, password });
+      const res = await loginUser({ email, password });
 
-      // Navigate to dashboard
-      router.push('/dashboard');
+      // Check if admin user
+      const user = res.user;
+      if (user?.role === 'admin' || email.trim().toLowerCase() === 'yeabkasz@gmail.com') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid credentials');
     } finally {
@@ -80,6 +85,7 @@ export default function LoginPage() {
                 {loading ? 'Signing in…' : 'Log In'}
               </button>
             </div>
+
           </form>
         </div>
       </div>

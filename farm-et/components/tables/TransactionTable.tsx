@@ -8,7 +8,7 @@ interface TransactionTableProps {
   transactions: Transaction[];
   onEdit: (transaction: Transaction) => void;
   onDuplicate: (transaction: Transaction) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: string | number) => void;
 }
 
 export function TransactionTable({

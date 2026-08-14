@@ -50,8 +50,8 @@ export default function CropsPage() {
   };
 
   // Handle deletion
-  const handleDeleteCrop = (id: string) => {
-    setCrops((prev) => prev.filter((c) => c.id !== id));
+  const handleDeleteCrop = (id: string | number) => {
+    setCrops((prev) => prev.filter((c) => String(c.id) !== String(id)));
   };
 
   return (

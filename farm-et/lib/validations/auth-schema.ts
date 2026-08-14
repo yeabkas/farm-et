@@ -1,10 +1,18 @@
 import { z } from "zod";
 
+export const strongPasswordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters long")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter (A-Z)")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter (a-z)")
+  .regex(/[0-9]/, "Password must contain at least one number (0-9)")
+  .regex(/[^A-Za-z0-9]/, "Password must contain at least one special symbol (!@#$%^&*)");
+
 export const onboardingSchema = z
   .object({
     // ── Account credentials (Step 1) ──────────────────────────────────────
     email: z.string().email("Enter a valid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: strongPasswordSchema,
     confirmPassword: z.string().min(1, "Please confirm your password"),
 
     // ── Personal info (Step 1) ────────────────────────────────────────────
@@ -32,4 +40,4 @@ export const onboardingSchema = z
     path: ["confirmPassword"],
   });
 
-export type OnboardingFormData = z.infer<typeof onboardingSchema>;
+export type OnboardingFormData = z.infer<typeof onboardingSchema>;

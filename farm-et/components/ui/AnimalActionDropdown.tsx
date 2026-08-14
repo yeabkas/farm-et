@@ -9,7 +9,7 @@ interface AnimalActionDropdownProps {
   onEdit: (animal: Animal) => void;
   onSell: (animal: Animal) => void;
   onDuplicate: (animal: Animal) => void;
-  onDelete: (animalId: string) => void;
+  onDelete: (animalId: string | number) => void;
 }
 
 export function AnimalActionDropdown({
@@ -79,7 +79,7 @@ export function AnimalActionDropdown({
 
           <button
             onClick={() => {
-              onDelete(animal.id);
+              if (animal.id !== undefined) onDelete(animal.id);
               setIsOpen(false);
             }}
             className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-gray-100"

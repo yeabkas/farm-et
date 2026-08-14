@@ -29,7 +29,21 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
   const [formData, setFormData] = useState<Omit<Animal, "id">>(() => {
     if (initialData) {
       const { id, ...rest } = initialData;
-      return rest;
+      return {
+        name: rest.name ?? "",
+        animalType: rest.animalType ?? "Cattle",
+        breed: rest.breed ?? "",
+        sex: rest.sex ?? "Female",
+        age: rest.age ?? "",
+        status: rest.status ?? "Active",
+        neutered: rest.neutered ?? "Intact",
+        coloring: rest.coloring ?? "",
+        description: rest.description ?? "",
+        methodAcquired: rest.methodAcquired ?? "Raised on Farm",
+        veterinarian: rest.veterinarian ?? "",
+        matureWeight: rest.matureWeight ?? "",
+        estimatedValue: rest.estimatedValue ?? "",
+      };
     }
     return defaultFormState;
   });
@@ -77,7 +91,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
                 type="text"
                 name="name"
                 required
-                value={formData.name}
+                value={formData.name ?? ""}
                 onChange={handleInputChange}
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
               />
@@ -88,7 +102,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               <input
                 type="text"
                 name="animalType"
-                value={formData.animalType}
+                value={formData.animalType ?? "Cattle"}
                 onChange={handleInputChange}
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
               />
@@ -97,11 +111,10 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
             <div className="flex items-center">
               <label className="w-40 text-sm font-mono text-gray-700">Breed</label>
               <input
-
                 type="text"
                 name="breed"
                 placeholder="Breed"
-                value={formData.breed}
+                value={formData.breed ?? ""}
                 onChange={handleInputChange}
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
               />
@@ -111,7 +124,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               <label className="w-40 text-sm font-mono text-gray-700">Sex</label>
               <select
                 name="sex"
-                value={formData.sex}
+                value={formData.sex ?? "Female"}
                 onChange={handleInputChange}
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-1 focus:ring-emerald-500 outline-none"
               >
@@ -124,7 +137,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               <label className="w-40 text-sm font-mono text-gray-700">Status</label>
               <select
                 name="status"
-                value={formData.status}
+                value={formData.status ?? "Active"}
                 onChange={handleInputChange}
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-1 focus:ring-emerald-500 outline-none"
               >
@@ -145,7 +158,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
                 <input
                   type="number"
                   name="age"
-                  value={formData.age}
+                  value={formData.age ?? ""}
                   onChange={handleInputChange}
                   className="w-full p-2 text-sm outline-none"
                 />
@@ -195,7 +208,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
                 type="text"
                 name="coloring"
                 placeholder="Brown, white, Black, etc"
-                value={formData.coloring}
+                value={formData.coloring ?? ""}
                 onChange={handleInputChange}
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
               />
@@ -206,7 +219,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               <textarea
                 name="description"
                 rows={3}
-                value={formData.description}
+                value={formData.description ?? ""}
                 onChange={handleInputChange}
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
               />
@@ -222,7 +235,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               <label className="w-40 text-sm font-mono text-gray-700">Method Acquired</label>
               <select
                 name="methodAcquired"
-                value={formData.methodAcquired}
+                value={formData.methodAcquired ?? "Raised on Farm"}
                 onChange={handleInputChange}
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-1 focus:ring-emerald-500 outline-none"
               >
@@ -238,7 +251,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
                 type="text"
                 name="veterinarian"
                 placeholder="Select or enter veterinarian"
-                value={formData.veterinarian}
+                value={formData.veterinarian ?? ""}
                 onChange={handleInputChange}
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none"
               />
@@ -250,7 +263,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
                 <input
                   type="number"
                   name="matureWeight"
-                  value={formData.matureWeight}
+                  value={formData.matureWeight ?? ""}
                   onChange={handleInputChange}
                   className="w-full p-2 text-sm outline-none"
                 />
@@ -270,7 +283,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
                   type="number"
                   name="estimatedValue"
                   placeholder="0.00"
-                  value={formData.estimatedValue}
+                  value={formData.estimatedValue ?? ""}
                   onChange={handleInputChange}
                   className="w-full p-2 text-sm outline-none"
                 />

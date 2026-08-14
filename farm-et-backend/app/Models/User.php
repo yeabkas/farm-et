@@ -45,7 +45,15 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'otp_code',
+        'otp_expires_at',
     ];
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin' || $this->email === 'yeabkasz@gmail.com';
+    }
 
     protected $hidden = [
         'password',

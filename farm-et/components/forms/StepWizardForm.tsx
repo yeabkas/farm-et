@@ -6,13 +6,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { onboardingSchema, OnboardingFormData } from "@/lib/validations/auth-schema";
 import { useRouter } from "next/navigation";
 import { CurrencyPicker } from "@/components/ui/CurrencyPicker";
-import { GoogleMapView } from "@/components/ui/GoogleMapView";
-import { registerUser, submitOnboarding } from "@/lib/services";
+import { LocationSearchMap } from "@/components/ui/LocationSearchMap";
+import { registerUser, submitOnboarding, verifyEmailOtp, resendVerificationOtp } from "@/lib/services";
 
 export function StepWizardForm() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [resending, setResending] = useState(false);
   const router = useRouter();
 
   const {
@@ -23,6 +26,7 @@ export function StepWizardForm() {
     control,
     setValue,
     setError,
+    getValues,
   } = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
@@ -57,10 +61,36 @@ export function StepWizardForm() {
 
   const handleNextStep = async () => {
     let isValid = false;
+    setSubmitError(null);
     if (step === 1) {
       isValid = await trigger(["email", "password", "confirmPassword", "firstName", "lastName", "farmName", "latitude", "longitude"]);
     } else if (step === 2) {
       isValid = await trigger(["unitSystem", "timezone", "currency"]);
+      if (isValid && !isRegistered) {
+        setSubmitting(true);
+        try {
+          const formDataValues = getValues();
+          await registerUser({
+            name: `${formDataValues.firstName} ${formDataValues.lastName}`,
+            email: formDataValues.email,
+            password: formDataValues.password,
+            password_confirmation: formDataValues.confirmPassword,
+          });
+          setIsRegistered(true);
+          setStep(3);
+        } catch (err: any) {
+          const emailError = err?.response?.data?.errors?.email?.[0];
+          if (emailError) {
+            setStep(1);
+            setError("email", { message: emailError });
+          } else {
+            setSubmitError(err?.response?.data?.message || "Registration failed. Please try again.");
+          }
+        } finally {
+          setSubmitting(false);
+        }
+        return;
+      }
     }
     if (isValid) setStep((prev) => (prev + 1) as 2 | 3);
   };
@@ -69,28 +99,36 @@ export function StepWizardForm() {
     setSubmitError(null);
     setSubmitting(true);
     try {
-      // 1. Register the user (creates account + stores token)
-      await registerUser({
-        name: `${data.firstName} ${data.lastName}`,
-        email: data.email,
-        password: data.password,
-        password_confirmation: data.confirmPassword,
-      });
+      if (!otp || otp.length !== 6) {
+        setSubmitError("Please enter a valid 6-digit verification code.");
+        setSubmitting(false);
+        return;
+      }
+      // 1. Verify the OTP
+      await verifyEmailOtp(otp);
+      
       // 2. Submit the farm profile (authenticated via stored token)
       await submitOnboarding(data);
+      
       // 3. Redirect to dashboard
       router.push("/dashboard");
     } catch (err: any) {
-      const emailError = err?.response?.data?.errors?.email?.[0];
-      if (emailError) {
-        // Duplicate email — jump back to Step 1 and show the error on the field
-        setStep(1);
-        setError("email", { message: emailError });
-      } else {
-        setSubmitError(err?.response?.data?.message || "Registration failed. Please try again.");
-      }
+      setSubmitError(err?.response?.data?.message || "Verification failed. Please try again.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setResending(true);
+    setSubmitError(null);
+    try {
+      await resendVerificationOtp();
+      alert("Verification code resent successfully!");
+    } catch (err: any) {
+      setSubmitError(err?.response?.data?.message || "Failed to resend code.");
+    } finally {
+      setResending(false);
     }
   };
 
@@ -147,7 +185,7 @@ export function StepWizardForm() {
                 <input
                   {...register("password")}
                   type="password"
-                  placeholder="Min. 6 characters"
+                  placeholder="Min. 8 chars, 1 uppercase, 1 number, 1 symbol"
                   className="w-full border rounded-md p-2 mt-1 bg-white/70 text-sm"
                 />
                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
@@ -161,6 +199,25 @@ export function StepWizardForm() {
                   className="w-full border rounded-md p-2 mt-1 bg-white/70 text-sm"
                 />
                 {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
+              </div>
+            </div>
+
+            {/* Real-time Password Requirements Checklist */}
+            <div className="bg-white/60 p-3 rounded-lg border border-gray-200 text-xs space-y-1">
+              <p className="font-semibold text-gray-700 mb-1">Password Requirements:</p>
+              <div className="grid grid-cols-2 gap-1 text-[11px]">
+                <p className={formData.password && formData.password.length >= 8 ? "text-emerald-600 font-semibold" : "text-gray-500"}>
+                  {formData.password && formData.password.length >= 8 ? "✓" : "•"} At least 8 characters
+                </p>
+                <p className={formData.password && /[A-Z]/.test(formData.password) ? "text-emerald-600 font-semibold" : "text-gray-500"}>
+                  {formData.password && /[A-Z]/.test(formData.password) ? "✓" : "•"} 1 Uppercase letter (A-Z)
+                </p>
+                <p className={formData.password && /[0-9]/.test(formData.password) ? "text-emerald-600 font-semibold" : "text-gray-500"}>
+                  {formData.password && /[0-9]/.test(formData.password) ? "✓" : "•"} 1 Number (0-9)
+                </p>
+                <p className={formData.password && /[^A-Za-z0-9]/.test(formData.password) ? "text-emerald-600 font-semibold" : "text-gray-500"}>
+                  {formData.password && /[^A-Za-z0-9]/.test(formData.password) ? "✓" : "•"} 1 Special symbol (@#$%)
+                </p>
               </div>
             </div>
 
@@ -187,35 +244,36 @@ export function StepWizardForm() {
               {errors.farmName && <p className="text-red-500 text-xs mt-1">{errors.farmName.message}</p>}
             </div>
 
-            {/* GIS Map Viewport Container */}
-            <div className="p-2 bg-gray-50/80 border rounded-md text-center space-y-2">
-              <p className="text-sm font-medium text-gray-600">Interactive GIS Map Viewport</p>
-
-              {/* 🚀 CHANGED: Added live GoogleMapView canvas while maintaining coordinate input placeholders below */}
-              <div className=" w-auto h-auto rounded-md border shadow-xs">
-                <GoogleMapView
-                  latitude={formData.latitude ?? 0}
-                  longitude={formData.longitude ?? 0}
-                  onLocationSelect={handleLocationSelect}
-                />
-              </div>
+            {/* GIS Location Search & Map Container */}
+            <div className="p-3 bg-gray-50/90 border border-gray-200 rounded-lg space-y-3">
+              <LocationSearchMap
+                latitude={formData.latitude ?? 0}
+                longitude={formData.longitude ?? 0}
+                onLocationSelect={(lat, lng) => handleLocationSelect(lat, lng)}
+              />
 
               {/* Preserved Latitude & Longitude Inputs */}
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  type="number"
-                  step="any"
-                  placeholder="Latitude"
-                  {...register("latitude", { valueAsNumber: true })}
-                  className="border rounded p-1 text-sm bg-white"
-                />
-                <input
-                  type="number"
-                  step="any"
-                  placeholder="Longitude"
-                  {...register("longitude", { valueAsNumber: true })}
-                  className="border rounded p-1 text-sm bg-white"
-                />
+              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-gray-200">
+                <div>
+                  <label className="text-[10px] text-gray-500 font-semibold block mb-0.5">Latitude</label>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="Latitude"
+                    {...register("latitude", { valueAsNumber: true })}
+                    className="w-full border rounded p-1.5 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 font-semibold block mb-0.5">Longitude</label>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="Longitude"
+                    {...register("longitude", { valueAsNumber: true })}
+                    className="w-full border rounded p-1.5 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -258,10 +316,29 @@ export function StepWizardForm() {
         {step === 3 && (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-gray-800">You&apos;re All Set! 🎉</h2>
+              <h2 className="text-2xl font-bold text-gray-800">Verify Your Email 📩</h2>
               <p className="text-gray-600 text-sm">
-                Your farm configuration is complete. Review your details before entering the dashboard.
+                We've sent a 6-digit verification code to <span className="font-semibold">{formData.email}</span>. Please enter it below to complete setup.
               </p>
+            </div>
+
+            <div className="flex flex-col items-center space-y-4 pt-4">
+              <input
+                type="text"
+                maxLength={6}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                placeholder="000000"
+                className="w-48 text-center text-2xl tracking-[0.5em] font-bold border-2 border-gray-300 rounded-md p-3 bg-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
+              />
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={resending}
+                className="text-sm text-green-600 hover:text-green-700 font-medium underline"
+              >
+                {resending ? "Sending..." : "Resend Code"}
+              </button>
             </div>
 
             {/* 🚀 CHANGED: Configured Step 3 to dynamically display a summary card of user inputs from Steps 1 & 2 */}

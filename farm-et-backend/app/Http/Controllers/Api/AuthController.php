@@ -7,6 +7,10 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OtpVerificationMail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -19,14 +23,25 @@ class AuthController extends Controller
         $fields = $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                Password::min(8)->letters()->mixedCase()->numbers()->symbols(),
+            ],
         ]);
+
+        $otpCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
         $user = User::create([
             'name'     => $fields['name'],
             'email'    => $fields['email'],
             'password' => Hash::make($fields['password']),
+            'otp_code' => $otpCode,
+            'otp_expires_at' => now()->addMinutes(30),
         ]);
+
+        Mail::to($user->email)->send(new OtpVerificationMail($otpCode));
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -87,5 +102,60 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         return new UserResource($request->user());
+    }
+
+    /**
+     * Verify the user's email address using OTP.
+     */
+    public function verifyEmail(Request $request)
+    {
+        $request->validate([
+            'otp' => 'required|string',
+        ]);
+
+        $user = $request->user();
+
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'Email already verified.'], 400);
+        }
+
+        if ($user->otp_code !== $request->otp) {
+            return response()->json(['message' => 'Invalid verification code.'], 400);
+        }
+
+        if (now()->greaterThan($user->otp_expires_at)) {
+            return response()->json(['message' => 'Verification code has expired.'], 400);
+        }
+
+        $user->update([
+            'email_verified_at' => now(),
+            'otp_code' => null,
+            'otp_expires_at' => null,
+        ]);
+
+        return response()->json(['message' => 'Email verified successfully.']);
+    }
+
+    /**
+     * Resend the OTP verification email.
+     */
+    public function resendOtp(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'Email already verified.'], 400);
+        }
+
+        $otpCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        $user->update([
+            'otp_code' => $otpCode,
+            'otp_expires_at' => now()->addMinutes(30),
+        ]);
+
+        Mail::to($user->email)->send(new OtpVerificationMail($otpCode));
+
+        return response()->json(['message' => 'Verification code resent successfully.']);
     }
 }

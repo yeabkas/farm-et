@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchUserProfile } from "@/lib/services";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -11,6 +12,7 @@ import {
   Receipt,
   Store,
   BeefIcon,
+  ShieldCheck,
 } from "lucide-react";
 
 
@@ -27,7 +29,7 @@ interface NavSection {
   items: SubItem[];
 }
 
-const navSections: NavSection[] = [
+const baseNavSections: NavSection[] = [
   {
     key: "livestock",
     name: "Livestock",
@@ -70,9 +72,40 @@ const navSections: NavSection[] = [
   },
 ];
 
+const adminNavSection: NavSection = {
+  key: "admin",
+  name: "Admin Portal",
+  icon: ShieldCheck,
+  baseHref: "/admin",
+  items: [
+    { name: "Overview & Users", href: "/admin/dashboard" },
+  ],
+};
+
 export function Sidebar() {
   const pathname = usePathname();
   const [openSection, setOpenSection] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ role?: string } | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await fetchUserProfile();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Safely extract role, considering possible Laravel resource wrapper
+  const role = (currentUser as any)?.data?.role || (currentUser as any)?.role;
+
+  // Build nav sections based on user role
+  const navSections = role === "admin"
+    ? [...baseNavSections, adminNavSection]
+    : baseNavSections;
 
   // Determine the default section to expand based on current route.
   // This avoids the need for useEffect and avoids the React warning about
@@ -112,8 +145,8 @@ export function Sidebar() {
                 type="button"
                 onClick={() => toggleSection(section.key)}
                 className={`w-full flex items-center justify-between px-3 py-2 text-sm font-mono rounded-md transition-colors ${isSectionActive
-                    ? "text-gray-900 font-semibold"
-                    : "text-gray-700 hover:bg-gray-50"
+                  ? "text-gray-900 font-semibold"
+                  : "text-gray-700 hover:bg-gray-50"
                   }`}
               >
                 <div className="font-mono flex items-center gap-3">
@@ -137,8 +170,8 @@ export function Sidebar() {
                         key={subItem.href}
                         href={subItem.href}
                         className={`block px-3 py-1.5 text-xs rounded-md transition-colors ${isSubActive
-                            ? "bg-gray-200/80 text-gray-900 font-mono"
-                            : "text-gray-600 hover:bg-gray-100"
+                          ? "bg-gray-200/80 text-gray-900 font-mono"
+                          : "text-gray-600 hover:bg-gray-100"
                           }`}
                       >
                         {subItem.name}

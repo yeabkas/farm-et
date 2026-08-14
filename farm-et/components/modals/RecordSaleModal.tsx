@@ -7,7 +7,7 @@ import { Animal } from "@/types/animal";
 interface RecordSaleModalProps {
   animal: Animal;
   onClose: () => void;
-  onConfirmSale: (animalId: string, saleData: { buyer: string; price: number; note: string }) => void;
+  onConfirmSale: (animalId: string | number, saleData: { buyer: string; price: number; note: string }) => void;
 }
 
 export function RecordSaleModal({ animal, onClose, onConfirmSale }: RecordSaleModalProps) {

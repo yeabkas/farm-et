@@ -52,6 +52,16 @@ export const fetchUserProfile = async () => {
   return response.data;
 };
 
+export const verifyEmailOtp = async (otp: string) => {
+  const response = await api.post('/email/verify', { otp });
+  return response.data;
+};
+
+export const resendVerificationOtp = async () => {
+  const response = await api.post('/email/resend');
+  return response.data;
+};
+
 // ─── Onboarding ───────────────────────────────────────────────────────────────
 
 export const submitOnboarding = async (data: OnboardingFormData) => {
@@ -104,5 +114,17 @@ export const fetchMarketListings = async () => {
   // This endpoint is public — no auth token needed
   const response = await api.get('/market/listings');
   return response.data; // { data: [...], total: n }
+};
+
+// ─── Admin Services (Restricted) ──────────────────────────────────────────────
+
+export const fetchAdminUsers = async () => {
+  const response = await api.get('/admin/users');
+  return response.data;
+};
+
+export const fetchAdminUserDetails = async (userId: number | string) => {
+  const response = await api.get(`/admin/users/${userId}`);
+  return response.data;
 };
 

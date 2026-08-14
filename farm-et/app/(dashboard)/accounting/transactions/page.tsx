@@ -46,8 +46,8 @@ export default function TransactionsPage() {
   };
 
   // Delete a transaction
-  const handleDeleteTransaction = (id: string) => {
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
+  const handleDeleteTransaction = (id: string | number) => {
+    setTransactions((prev) => prev.filter((t) => String(t.id) !== String(id)));
   };
 
   // Form submit handler (Handles BOTH Create and Update)

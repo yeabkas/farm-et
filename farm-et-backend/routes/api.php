@@ -22,6 +22,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth
     Route::get('/me',      [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
+    Route::post('/email/resend', [AuthController::class, 'resendOtp']);
 
     // Onboarding / Farm Profile
     Route::post('/onboarding', [OnboardingController::class, 'store']);
@@ -40,4 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Financial Reports
     Route::get('/reports/summary',    [ReportController::class, 'summary']);
     Route::get('/reports/cash-flow',  [ReportController::class, 'cashFlow']);
+
+    // Admin routes (Restricted to platform administrator)
+    Route::get('/admin/users',      [\App\Http\Controllers\Api\AdminController::class, 'users']);
+    Route::get('/admin/users/{id}', [\App\Http\Controllers\Api\AdminController::class, 'showUser']);
 });
