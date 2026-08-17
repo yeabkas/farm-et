@@ -21,6 +21,7 @@ export const onboardingSchema = z
 
     // ── Farm info (Step 1) ────────────────────────────────────────────────
     farmName: z.string().min(2, "Farm name is required"),
+    phoneNumber: z.string().optional().or(z.literal("")),
     latitude: z.number().min(-90).max(90),
     longitude: z.number().min(-180).max(180),
 

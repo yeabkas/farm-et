@@ -40,6 +40,7 @@ class OnboardingController extends Controller
         $validated = $request->validate([
             'firstName' => 'required|string|max:100',
             'lastName' => 'required|string|max:100',
+            'phoneNumber' => 'nullable|string|max:20',
             'farmName' => 'required|string|max:255',
             'latitude' => 'nullable|numeric|min:-90|max:90',
             'longitude' => 'nullable|numeric|min:-180|max:180',
@@ -76,6 +77,7 @@ class OnboardingController extends Controller
         $validated = $request->validate([
             'firstName' => 'sometimes|string|max:100',
             'lastName' => 'sometimes|string|max:100',
+            'phoneNumber' => 'nullable|string|max:20',
             'farmName' => 'sometimes|string|max:255',
             'latitude' => 'nullable|numeric|min:-90|max:90',
             'longitude' => 'nullable|numeric|min:-180|max:180',

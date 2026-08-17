@@ -14,6 +14,7 @@ class FarmProfile extends Model
         'user_id',
         'first_name',
         'last_name',
+        'phone_number',
         'farm_name',
         'latitude',
         'longitude',

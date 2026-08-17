@@ -101,8 +101,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
             Type & Variety
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-4xl">
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">
                 Crop Type *
               </label>
               <input
@@ -116,8 +116,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
               />
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">
                 Status
               </label>
               <select
@@ -133,8 +133,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
               </select>
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">
                 Variety / Strain
               </label>
               <input
@@ -147,8 +147,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
               />
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">
                 Botanical Name
               </label>
               <input
@@ -161,8 +161,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
               />
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">
                 Internal ID / SKU
               </label>
               <input
@@ -175,8 +175,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
               />
             </div>
 
-            <div className="flex items-start col-span-1 md:col-span-2">
-              <label className="w-40 text-sm font-mono text-gray-700 pt-2">
+            <div className="flex flex-col sm:flex-row items-start gap-1.5 sm:gap-0 col-span-1 md:col-span-2">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700 pt-2">
                 Description
               </label>
               <textarea
@@ -197,8 +197,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
             Growth Details
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-4xl">
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">
                 Days to Maturity
               </label>
               <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden">
@@ -216,8 +216,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
               </div>
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">
                 Perennial
               </label>
               <div className="flex items-center gap-2">
@@ -243,8 +243,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
             Harvest & Economics
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-4xl">
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">
                 Harvest Units
               </label>
               <select
@@ -262,8 +262,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
               </select>
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">
                 Sale Window
               </label>
               <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden">
@@ -281,8 +281,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
               </div>
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">
                 Est. Value
               </label>
               <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden">
@@ -306,18 +306,18 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
         </div>
 
         {/* Footer Buttons */}
-        <div className="pt-6 border-t flex items-center justify-between">
+        <div className="pt-6 border-t flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <button
             type="button"
-            className="text-xs text-emerald-600 hover:underline font-mono"
+            className="text-xs text-emerald-600 hover:underline font-mono self-start sm:self-auto"
           >
             Customize Fields
           </button>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-mono text-gray-600 hover:bg-gray-100 rounded-md transition"
+              className="px-4 py-2 text-sm font-mono text-gray-600 hover:bg-gray-100 rounded-md transition w-full sm:w-auto text-center"
             >
               Cancel
             </button>
@@ -325,14 +325,14 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
               <button
                 type="button"
                 onClick={handleSaveAndNew}
-                className="px-4 py-2 text-sm font-mono border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md transition"
+                className="px-4 py-2 text-sm font-mono border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md transition w-full sm:w-auto text-center"
               >
                 Save & New
               </button>
             )}
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-mono bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition shadow-xs"
+              className="px-5 py-2 text-sm font-mono bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition shadow-xs w-full sm:w-auto text-center"
             >
               {isEditing ? "Save Changes" : "Create"}
             </button>

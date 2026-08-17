@@ -286,7 +286,7 @@ export function TransactionFormModal({
         </form>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50 rounded-b-lg">
+        <div className="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50 rounded-b-lg">
           <div>
             {isEditing && onDelete && (
               <button
@@ -295,7 +295,7 @@ export function TransactionFormModal({
                   if (initialData?.id) onDelete(initialData.id);
                   onClose();
                 }}
-                className="p-2 text-red-600 hover:bg-red-100 rounded-md transition"
+                className="p-2 text-red-600 hover:bg-red-100 rounded-md transition self-start sm:self-auto"
                 title="Delete Transaction"
               >
                 <Trash2 className="w-4 h-4" />
@@ -303,18 +303,18 @@ export function TransactionFormModal({
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition w-full sm:w-auto text-center"
             >
               Close
             </button>
             <button
               type="submit"
               form="transaction-form"
-              className="px-5 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition shadow-xs"
+              className="px-5 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition shadow-xs w-full sm:w-auto text-center"
             >
               {isEditing ? "Update" : "Create"}
             </button>

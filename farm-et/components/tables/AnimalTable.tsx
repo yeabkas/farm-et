@@ -56,19 +56,19 @@ export function AnimalTable({ animals, onEdit, onSell, onDuplicate, onDelete }: 
       </div>
 
       {/* Data Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-visible shadow-xs">
-        <table className="w-full text-left border-collapse text-sm">
+      <div className="bg-white border border-gray-200 rounded-lg overflow-x-auto shadow-xs min-h-[300px]">
+        <table className="w-full text-left border-collapse text-sm whitespace-nowrap">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50 text-xs font-mono text-gray-600">
               <th className="p-3 w-8">
                 <input type="checkbox" className="rounded-xs border-gray-300" />
               </th>
               <th className="p-3">Animal</th>
-              <th className="p-3">Gender</th>
-              <th className="p-3">Age</th>
-              <th className="p-3">Last Weight</th>
+              <th className="p-3 hidden md:table-cell">Gender</th>
+              <th className="p-3 hidden md:table-cell">Age</th>
+              <th className="p-3 hidden lg:table-cell">Last Weight</th>
               <th className="p-3">Status</th>
-              <th className="p-3">Type</th>
+              <th className="p-3 hidden sm:table-cell">Type</th>
               <th className="p-3 w-8"></th>
             </tr>
           </thead>
@@ -86,9 +86,9 @@ export function AnimalTable({ animals, onEdit, onSell, onDuplicate, onDelete }: 
                     {animal.name}
                   </span>
                 </td>
-                <td className="p-3 text-gray-600">{animal.sex}</td>
-                <td className="p-3 text-gray-600">{animal.age ? `${animal.age} yrs` : "--"}</td>
-                <td className="p-3 text-gray-600">
+                <td className="p-3 text-gray-600 hidden md:table-cell">{animal.sex}</td>
+                <td className="p-3 text-gray-600 hidden md:table-cell">{animal.age ? `${animal.age} yrs` : "--"}</td>
+                <td className="p-3 text-gray-600 hidden lg:table-cell">
                   {animal.matureWeight ? `${animal.matureWeight} kg` : "--"}
                 </td>
                 <td className="p-3">
@@ -102,7 +102,7 @@ export function AnimalTable({ animals, onEdit, onSell, onDuplicate, onDelete }: 
                     {animal.status === "For Sale" ? "🏷️ For Sale" : animal.status}
                   </span>
                 </td>
-                <td className="p-3 text-emerald-600">{animal.animalType}</td>
+                <td className="p-3 text-emerald-600 hidden sm:table-cell">{animal.animalType}</td>
                 <td className="p-3 text-right">
   <ActionDropdown 
     item={animal}

@@ -182,7 +182,7 @@ export function StepWizardForm() {
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Password</label>
                 <input
@@ -228,7 +228,7 @@ export function StepWizardForm() {
               <h3 className="text-sm font-semibold text-gray-600 mb-2">Tell us about your farm</h3>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">First Name</label>
                 <input {...register("firstName")} className="w-full border rounded-md p-2 mt-1 bg-white/70" />
@@ -241,10 +241,17 @@ export function StepWizardForm() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Farm Name</label>
-              <input {...register("farmName")} className="w-full border rounded-md p-2 mt-1 bg-white/70" />
-              {errors.farmName && <p className="text-red-500 text-xs mt-1">{errors.farmName.message}</p>}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Farm Name</label>
+                <input {...register("farmName")} className="w-full border rounded-md p-2 mt-1 bg-white/70" />
+                {errors.farmName && <p className="text-red-500 text-xs mt-1">{errors.farmName.message}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Phone Number <span className="text-gray-400 font-normal">(Optional)</span></label>
+                <input {...register("phoneNumber")} type="tel" placeholder="+251 911..." className="w-full border rounded-md p-2 mt-1 bg-white/70" />
+                {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber.message}</p>}
+              </div>
             </div>
 
             {/* GIS Location Search & Map Container */}
@@ -256,7 +263,7 @@ export function StepWizardForm() {
               />
 
               {/* Preserved Latitude & Longitude Inputs */}
-              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-gray-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-gray-200">
                 <div>
                   <label className="text-[10px] text-gray-500 font-semibold block mb-0.5">Latitude</label>
                   <input
@@ -297,7 +304,7 @@ export function StepWizardForm() {
   </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 <div>
     <label className="block text-sm font-medium text-gray-700 mb-1">
       Currency
@@ -322,6 +329,9 @@ export function StepWizardForm() {
               <h2 className="text-2xl font-bold text-gray-800">Verify Your Email 📩</h2>
               <p className="text-gray-600 text-sm">
                 We&apos;ve sent a 6-digit verification code to <span className="font-semibold">{formData.email}</span>. Please enter it below to complete setup.
+              </p>
+              <p className="text-emerald-600 text-xs font-medium">
+                (If you don&apos;t see the email, please check your spam folder)
               </p>
             </div>
 
@@ -357,6 +367,13 @@ export function StepWizardForm() {
                 <span className="text-gray-500">Farm Name:</span>
                 <span className="font-semibold text-gray-800">{formData.farmName}</span>
               </div>
+
+              {formData.phoneNumber && (
+                <div className="flex justify-between border-b pb-2">
+                  <span className="text-gray-500">Phone Number:</span>
+                  <span className="font-semibold text-gray-800">{formData.phoneNumber}</span>
+                </div>
+              )}
 
               <div className="flex justify-between border-b pb-2">
                 <span className="text-gray-500">Location (Lat, Long):</span>

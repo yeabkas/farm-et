@@ -39,6 +39,8 @@ class MarketController extends Controller
                     'sellerName' => $profile
                         ? trim(($profile->first_name ?? '').' '.($profile->last_name ?? ''))
                         : ($animal->user?->name ?? 'Unknown'),
+                    'sellerEmail' => $animal->user?->email,
+                    'sellerPhone' => $profile?->phone_number,
                     'farmName' => $profile?->farm_name ?? 'Unknown Farm',
                     'createdAt' => $animal->created_at?->toDateString(),
                 ];
@@ -66,6 +68,8 @@ class MarketController extends Controller
                     'sellerName' => $profile
                         ? trim(($profile->first_name ?? '').' '.($profile->last_name ?? ''))
                         : ($crop->user?->name ?? 'Unknown'),
+                    'sellerEmail' => $crop->user?->email,
+                    'sellerPhone' => $profile?->phone_number,
                     'farmName' => $profile?->farm_name ?? 'Unknown Farm',
                     'createdAt' => $crop->created_at?->toDateString(),
                 ];

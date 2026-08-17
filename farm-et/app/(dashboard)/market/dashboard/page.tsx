@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { fetchMarketListings } from "@/lib/services";
-import { Search, SlidersHorizontal, Tag, MapPin, Package, X, ShoppingBag } from "lucide-react";
+import { Search, SlidersHorizontal, Tag, MapPin, Package, X, ShoppingBag, Phone, Mail } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -19,6 +19,8 @@ interface Listing {
   harvestUnits?: string | null;
   matureWeight?: number | string | null;
   sellerName: string;
+  sellerEmail?: string | null;
+  sellerPhone?: string | null;
   farmName: string;
   createdAt: string;
 }
@@ -106,10 +108,41 @@ function ContactModal({ listing, onClose }: { listing: Listing; onClose: () => v
         {listing.description && (
           <p className="text-sm text-gray-600 mb-5 leading-relaxed">{listing.description}</p>
         )}
-        <p className="text-xs text-gray-500 text-center bg-gray-50 rounded-lg p-3">
-          📞 Contact the seller directly through your farm network or visit{" "}
-          <strong>{listing.farmName}</strong> to arrange a purchase.
-        </p>
+
+        <div className="space-y-3 mb-5">
+          <h4 className="text-sm font-semibold text-gray-800">Contact Seller</h4>
+          <div className="flex flex-col gap-2">
+            {listing.sellerEmail ? (
+              <a href={`mailto:${listing.sellerEmail}`} className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                  <Mail className="w-4 h-4 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 font-medium">Email Address</p>
+                  <p className="text-sm text-gray-900 font-semibold">{listing.sellerEmail}</p>
+                </div>
+              </a>
+            ) : null}
+
+            {listing.sellerPhone ? (
+              <a href={`tel:${listing.sellerPhone}`} className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                  <Phone className="w-4 h-4 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 font-medium">Phone Number</p>
+                  <p className="text-sm text-gray-900 font-semibold">{listing.sellerPhone}</p>
+                </div>
+              </a>
+            ) : null}
+
+            {!listing.sellerEmail && !listing.sellerPhone && (
+               <p className="text-xs text-gray-500 italic bg-gray-50 rounded-lg p-3">
+                 No direct contact info available. Visit <strong>{listing.farmName}</strong> to arrange a purchase.
+               </p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

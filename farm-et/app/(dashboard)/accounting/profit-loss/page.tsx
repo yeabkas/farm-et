@@ -62,8 +62,8 @@ export default function PnLStatementPage() {
       />
 
       {/* Main Report Table Container */}
-      <div className="border border-gray-200 rounded-md bg-white overflow-hidden shadow-xs">
-        <table className="w-full text-left border-collapse text-xs">
+      <div className="border border-gray-200 rounded-md bg-white overflow-x-auto shadow-xs">
+        <table className="w-full text-left border-collapse text-xs whitespace-nowrap min-w-full">
           <tbody>
             {/* INCOME SECTION */}
             <tr className="border-b border-gray-200 bg-gray-50/50">

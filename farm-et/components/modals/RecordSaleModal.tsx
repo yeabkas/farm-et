@@ -87,8 +87,8 @@ export function RecordSaleModal({ animal, onClose, onConfirmSale }: RecordSaleMo
             <h3 className="text-sm font-semibold text-gray-700">Sale Information</h3>
 
             <div className="grid grid-cols-1 gap-4 max-w-md">
-              <div className="flex items-center">
-                <label className="w-32 text-xs text-gray-600">Sold To</label>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+                <label className="w-full sm:w-32 text-xs text-gray-600">Sold To</label>
                 <input
                   type="text"
                   placeholder="John Smith"
@@ -98,9 +98,9 @@ export function RecordSaleModal({ animal, onClose, onConfirmSale }: RecordSaleMo
                 />
               </div>
 
-              <div className="flex items-center">
-                <label className="w-32 text-xs text-gray-600">Total Sale Price</label>
-                <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+                <label className="w-full sm:w-32 text-xs text-gray-600">Total Sale Price</label>
+                <div className="flex-1 flex w-full border border-gray-300 rounded-md overflow-hidden">
                   <span className="bg-gray-100 border-r border-gray-300 px-3 flex items-center text-xs text-gray-500">
                     $
                   </span>
@@ -138,17 +138,17 @@ export function RecordSaleModal({ animal, onClose, onConfirmSale }: RecordSaleMo
           </div>
 
           {/* Footer Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md transition"
+              className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md transition w-full sm:w-auto text-center"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition shadow-xs"
+              className="px-5 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition shadow-xs w-full sm:w-auto text-center"
             >
               Save
             </button>

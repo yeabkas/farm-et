@@ -13,6 +13,7 @@ import {
   Store,
   BeefIcon,
   ShieldCheck,
+  ChevronLeft,
 } from "lucide-react";
 
 
@@ -66,8 +67,7 @@ const baseNavSections: NavSection[] = [
     baseHref: "/market",
     items: [
       { name: "Dashboard", href: "/market/dashboard" },
-      { name: "Products", href: "/market/products" },
-      { name: "Orders", href: "/market/orders" },
+
     ],
   },
 ];
@@ -82,7 +82,12 @@ const adminNavSection: NavSection = {
   ],
 };
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  setIsOpen?: (open: boolean) => void;
+}
+
+export function Sidebar({ isOpen = false, setIsOpen }: SidebarProps) {
   const pathname = usePathname();
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<{ role?: string } | null>(null);
@@ -120,71 +125,92 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-60 bg-white border-r border-gray-200 h-screen flex flex-col font-mono select-none">
-      {/* Brand Header */}
-      <div className="h-16 flex items-center px-6 border-b border-gray-100">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="text-2xl font-black font-mono tracking-tight text-emerald-600">
-            Farm-ET
-          </span>
-        </Link>
-      </div>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setIsOpen?.(false)}
+        />
+      )}
 
-      {/* Navigation Options */}
-      <nav className="flex-1 py-4 px-3 space-y-1 font-mono overflow-y-auto">
-        {navSections.map((section) => {
-          const Icon = section.icon;
-          const isSectionActive = pathname.startsWith(section.baseHref);
-          const isOpen =
-            openSection === section.key ||
-            (openSection === null && defaultOpenSection === section.key);
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 w-60 bg-white border-r border-gray-200 flex flex-col font-mono select-none transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+      >
+        {/* Brand Header */}
+        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-100">
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <span className="text-2xl font-black font-mono tracking-tight text-emerald-600">
+              Farm-ET
+            </span>
+          </Link>
+          {/* Mobile Close Button */}
+          <button
+            onClick={() => setIsOpen?.(false)}
+            className="md:hidden text-gray-500 hover:text-gray-800 focus:outline-none"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        </div>
 
-          return (
-            <div key={section.key} className="space-y-1 font-mono">
-              {/* Parent Toggle Button */}
-              <button
-                type="button"
-                onClick={() => toggleSection(section.key)}
-                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-mono rounded-md transition-colors ${isSectionActive
-                  ? "text-gray-900 font-semibold"
-                  : "text-gray-700 hover:bg-gray-50"
-                  }`}
-              >
-                <div className="font-mono flex items-center gap-3">
-                  <Icon className="w-4 h-4 text-gray-500" />
-                  <span>{section.name}</span>
-                </div>
-                {isOpen ? (
-                  <ChevronDown className="w-4 h-4 text-gray-400" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
+        {/* Navigation Options */}
+        <nav className="flex-1 py-4 px-3 space-y-1 font-mono overflow-y-auto">
+          {navSections.map((section) => {
+            const Icon = section.icon;
+            const isSectionActive = pathname.startsWith(section.baseHref);
+            const isOpen =
+              openSection === section.key ||
+              (openSection === null && defaultOpenSection === section.key);
+
+            return (
+              <div key={section.key} className="space-y-1 font-mono">
+                {/* Parent Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() => toggleSection(section.key)}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-sm font-mono rounded-md transition-colors ${isSectionActive
+                    ? "text-gray-900 font-semibold"
+                    : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                >
+                  <div className="font-mono flex items-center gap-3">
+                    <Icon className="w-4 h-4 text-gray-500" />
+                    <span>{section.name}</span>
+                  </div>
+                  {isOpen ? (
+                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  )}
+                </button>
+
+                {/* Sub-items List */}
+                {isOpen && (
+                  <div className="pl-9 pr-1 space-y-1">
+                    {section.items.map((subItem) => {
+                      const isSubActive = pathname === subItem.href;
+                      return (
+                        <Link
+                          key={subItem.href}
+                          href={subItem.href}
+                          onClick={() => setIsOpen?.(false)}
+                          className={`block px-3 py-1.5 text-xs rounded-md transition-colors ${isSubActive
+                            ? "bg-gray-200/80 text-gray-900 font-mono"
+                            : "text-gray-600 hover:bg-gray-100"
+                            }`}
+                        >
+                          {subItem.name}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 )}
-              </button>
-
-              {/* Sub-items List */}
-              {isOpen && (
-                <div className="pl-9 pr-1 space-y-1">
-                  {section.items.map((subItem) => {
-                    const isSubActive = pathname === subItem.href;
-                    return (
-                      <Link
-                        key={subItem.href}
-                        href={subItem.href}
-                        className={`block px-3 py-1.5 text-xs rounded-md transition-colors ${isSubActive
-                          ? "bg-gray-200/80 text-gray-900 font-mono"
-                          : "text-gray-600 hover:bg-gray-100"
-                          }`}
-                      >
-                        {subItem.name}
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </nav>
-    </aside>
+              </div>
+            );
+          })}
+        </nav>
+      </aside>
+    </>
   );
 }

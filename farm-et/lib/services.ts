@@ -68,6 +68,7 @@ export const submitOnboarding = async (data: OnboardingFormData) => {
   const response = await api.post('/onboarding', {
     firstName:  data.firstName,
     lastName:   data.lastName,
+    phoneNumber:data.phoneNumber,
     farmName:   data.farmName,
     latitude:   data.latitude,
     longitude:  data.longitude,

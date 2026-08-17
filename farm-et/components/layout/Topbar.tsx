@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, Search, Plus, User, LogOut, ChevronDown } from "lucide-react";
+import { Bell, Search, Plus, User, LogOut, ChevronDown, Menu } from "lucide-react";
 import { fetchUserProfile, logoutUser } from "@/lib/services";
 
 interface UserProfileData {
@@ -15,7 +15,11 @@ interface UserProfileData {
   lastName?: string | null;
 }
 
-export function Topbar() {
+interface TopbarProps {
+  onMenuClick?: () => void;
+}
+
+export function Topbar({ onMenuClick }: TopbarProps) {
   const router = useRouter();
   const [user, setUser] = useState<UserProfileData | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -61,9 +65,19 @@ export function Topbar() {
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 px-6 flex items-center justify-between sticky top-0 z-10 font-mono">
+      {/* Mobile Menu Button */}
+      <div className="flex items-center md:hidden">
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      </div>
 
-
-      {/* Right Controls: Profile */}
+      {/* Spacer for desktop to keep right controls on the right if left is empty */}
+      <div className="hidden md:block flex-1"></div>      {/* Right Controls: Profile */}
       <div className="flex items-center gap-4">
 
         {/* User Profile Dropdown */}

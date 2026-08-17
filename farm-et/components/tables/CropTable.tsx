@@ -70,8 +70,8 @@ export function CropTable({
       </div>
 
       {/* Data Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-visible shadow-xs">
-        <table className="w-full text-left border-collapse text-sm">
+      <div className="bg-white border border-gray-200 rounded-lg overflow-x-auto shadow-xs min-h-[300px]">
+        <table className="w-full text-left border-collapse text-sm whitespace-nowrap">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50 text-xs font-mono text-gray-600">
               <th className="p-3 w-8">
@@ -81,10 +81,10 @@ export function CropTable({
                 />
               </th>
               <th className="p-3">Crop / Variety</th>
-              <th className="p-3">Botanical Name</th>
-              <th className="p-3">SKU / ID</th>
-              <th className="p-3">Days to Maturity</th>
-              <th className="p-3">Perennial</th>
+              <th className="p-3 hidden lg:table-cell">Botanical Name</th>
+              <th className="p-3 hidden sm:table-cell">SKU / ID</th>
+              <th className="p-3 hidden md:table-cell">Days to Maturity</th>
+              <th className="p-3 hidden md:table-cell">Perennial</th>
               <th className="p-3">Status</th>
               <th className="p-3">Est. Value</th>
               <th className="p-3 w-8"></th>
@@ -120,22 +120,22 @@ export function CropTable({
                 </td>
 
                 {/* Botanical Name */}
-                <td className="p-3 text-gray-600 italic text-xs">
+                <td className="p-3 text-gray-600 italic text-xs hidden lg:table-cell">
                   {crop.botanicalName || "--"}
                 </td>
 
                 {/* SKU / Internal ID */}
-                <td className="p-3 text-gray-600">
+                <td className="p-3 text-gray-600 hidden sm:table-cell">
                   {crop.internalId || "--"}
                 </td>
 
                 {/* Days to Maturity */}
-                <td className="p-3 text-gray-600">
+                <td className="p-3 text-gray-600 hidden md:table-cell">
                   {crop.daysToMaturity ? `${crop.daysToMaturity} days` : "--"}
                 </td>
 
                 {/* Perennial Status */}
-                <td className="p-3">
+                <td className="p-3 hidden md:table-cell">
                   {crop.isPerennial ? (
                     <span className="bg-emerald-100 text-emerald-800 text-[11px] font-mono px-2.5 py-0.5 rounded-full">
                       Yes

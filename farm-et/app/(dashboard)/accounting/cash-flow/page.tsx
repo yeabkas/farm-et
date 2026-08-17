@@ -68,8 +68,8 @@ export default function CashFlowStatementPage() {
       />
 
       {/* Statement Table */}
-      <div className="border-t border-b border-gray-200 bg-white py-2">
-        <table className="w-full text-left border-collapse text-xs">
+      <div className="border-t border-b border-gray-200 bg-white py-2 overflow-x-auto">
+        <table className="w-full text-left border-collapse text-xs whitespace-nowrap min-w-full">
           <tbody>
             {/* BEGINNING CASH BALANCE */}
             <tr className="border-b border-gray-200 font-bold text-gray-800">

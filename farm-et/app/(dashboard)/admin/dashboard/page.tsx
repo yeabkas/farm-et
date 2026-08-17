@@ -335,16 +335,16 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* User Table (NO AVATARS per request) */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
+        <div className="overflow-x-auto pb-4">
+          <table className="w-full text-left border-collapse text-xs whitespace-nowrap min-w-full">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-100/70 text-gray-600 font-semibold">
                 <th className="p-3">User Name & Email</th>
                 <th className="p-3">Farm Name</th>
-                <th className="p-3">Role</th>
-                <th className="p-3 text-center">Transactions</th>
-                <th className="p-3 text-center">Items For Sale</th>
-                <th className="p-3">Joined Date</th>
+                <th className="p-3 hidden sm:table-cell">Role</th>
+                <th className="p-3 text-center hidden md:table-cell">Transactions</th>
+                <th className="p-3 text-center hidden lg:table-cell">Items For Sale</th>
+                <th className="p-3 hidden xl:table-cell">Joined Date</th>
                 <th className="p-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -370,7 +370,7 @@ export default function AdminDashboardPage() {
                       <p className="text-[11px] text-gray-500">{user.email}</p>
                     </td>
                     <td className="p-3 font-semibold text-gray-800">{user.farmName}</td>
-                    <td className="p-3">
+                    <td className="p-3 hidden sm:table-cell">
                       <span
                         className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                           user.role === "admin"
@@ -381,8 +381,8 @@ export default function AdminDashboardPage() {
                         {user.role.toUpperCase()}
                       </span>
                     </td>
-                    <td className="p-3 text-center font-bold text-gray-800">{user.totalTransactions}</td>
-                    <td className="p-3 text-center">
+                    <td className="p-3 text-center font-bold text-gray-800 hidden md:table-cell">{user.totalTransactions}</td>
+                    <td className="p-3 text-center hidden lg:table-cell">
                       <span
                         className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                           user.forSaleCount > 0
@@ -393,7 +393,7 @@ export default function AdminDashboardPage() {
                         {user.forSaleCount} Items
                       </span>
                     </td>
-                    <td className="p-3 text-gray-500">{user.createdAt}</td>
+                    <td className="p-3 text-gray-500 hidden xl:table-cell">{user.createdAt}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-right text-xs">
                       <div className="flex justify-end gap-2">
                         {currentUser?.email === "yeabkasz@gmail.com" &&
@@ -540,14 +540,14 @@ export default function AdminDashboardPage() {
                       </div>
                     ) : (
                       <div className="overflow-x-auto border border-gray-200 rounded-xl">
-                        <table className="w-full text-left text-xs">
+                        <table className="w-full text-left text-xs whitespace-nowrap min-w-full">
                           <thead>
                             <tr className="bg-gray-100 text-gray-700 font-semibold border-b">
                               <th className="p-3">Date</th>
-                              <th className="p-3">Type</th>
+                              <th className="p-3 hidden sm:table-cell">Type</th>
                               <th className="p-3">Category</th>
-                              <th className="p-3">Payee / Customer</th>
-                              <th className="p-3">Description</th>
+                              <th className="p-3 hidden md:table-cell">Payee / Customer</th>
+                              <th className="p-3 hidden lg:table-cell">Description</th>
                               <th className="p-3 text-right">Amount</th>
                             </tr>
                           </thead>
@@ -555,7 +555,7 @@ export default function AdminDashboardPage() {
                             {inspectData.transactions.map((tx) => (
                               <tr key={tx.id} className="hover:bg-gray-50">
                                 <td className="p-3 text-gray-600">{tx.date}</td>
-                                <td className="p-3">
+                                <td className="p-3 hidden sm:table-cell">
                                   <span
                                     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                       tx.type === "Income"
@@ -572,8 +572,8 @@ export default function AdminDashboardPage() {
                                   </span>
                                 </td>
                                 <td className="p-3 font-semibold text-gray-800">{tx.category}</td>
-                                <td className="p-3 text-gray-600">{tx.payeeCustomer || "N/A"}</td>
-                                <td className="p-3 text-gray-500 max-w-xs truncate">{tx.description || "--"}</td>
+                                <td className="p-3 text-gray-600 hidden md:table-cell">{tx.payeeCustomer || "N/A"}</td>
+                                <td className="p-3 text-gray-500 max-w-xs truncate hidden lg:table-cell">{tx.description || "--"}</td>
                                 <td className="p-3 text-right font-bold text-gray-900">
                                   ETB {tx.amount.toLocaleString()}
                                 </td>

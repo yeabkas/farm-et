@@ -86,8 +86,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
         <div className="space-y-4">
           <h3 className="text-lg font-mono text-gray-700 border-b pb-2">Basic Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-4xl">
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Name/Label</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Name/Label</label>
               <input
                 type="text"
                 name="name"
@@ -98,8 +98,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               />
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Animal Type</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Animal Type</label>
               <input
                 type="text"
                 name="animalType"
@@ -109,8 +109,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               />
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Breed</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Breed</label>
               <input
                 type="text"
                 name="breed"
@@ -121,8 +121,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               />
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Sex</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Sex</label>
               <select
                 name="sex"
                 value={formData.sex ?? "Female"}
@@ -134,8 +134,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               </select>
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Status</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Status</label>
               <select
                 name="status"
                 value={formData.status ?? "Active"}
@@ -153,8 +153,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               </select>
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Age</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Age</label>
               <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden">
                 <input
                   type="number"
@@ -175,8 +175,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
         <div className="space-y-4">
           <h3 className="text-lg font-mono text-gray-700 border-b pb-2">Physical Characteristics</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-4xl">
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Neutered</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Neutered</label>
               <div className="flex items-center gap-4 text-sm">
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <input
@@ -203,8 +203,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               </div>
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Coloring</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Coloring</label>
               <input
                 type="text"
                 name="coloring"
@@ -215,8 +215,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               />
             </div>
 
-            <div className="flex items-start col-span-1 md:col-span-2">
-              <label className="w-40 text-sm font-mono text-gray-700 pt-2">Description</label>
+            <div className="flex flex-col sm:flex-row items-start gap-1.5 sm:gap-0 col-span-1 md:col-span-2">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700 pt-2">Description</label>
               <textarea
                 name="description"
                 rows={3}
@@ -232,8 +232,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
         <div className="space-y-4">
           <h3 className="text-lg font-mono text-gray-700 border-b pb-2">Additional Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-4xl">
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Method Acquired</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Method Acquired</label>
               <select
                 name="methodAcquired"
                 value={formData.methodAcquired ?? "Raised on Farm"}
@@ -246,8 +246,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               </select>
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Veterinarian</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Veterinarian</label>
               <input
                 type="text"
                 name="veterinarian"
@@ -258,8 +258,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               />
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Mature Weight</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Mature Weight</label>
               <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden">
                 <input
                   type="number"
@@ -274,8 +274,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               </div>
             </div>
 
-            <div className="flex items-center">
-              <label className="w-40 text-sm font-mono text-gray-700">Estimated Value</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Estimated Value</label>
               <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden">
                 <span className="bg-gray-100 border-r border-gray-300 px-3 flex items-center text-xs text-gray-500 font-mono">
                   $
@@ -294,15 +294,15 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
         </div>
 
         {/* Footer Buttons */}
-        <div className="pt-6 border-t flex items-center justify-between">
-          <button type="button" className="text-xs text-emerald-600 hover:underline font-mono">
+        <div className="pt-6 border-t flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <button type="button" className="text-xs text-emerald-600 hover:underline font-mono self-start sm:self-auto">
             Customize Fields
           </button>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-mono text-gray-600 hover:bg-gray-100 rounded-md transition"
+              className="px-4 py-2 text-sm font-mono text-gray-600 hover:bg-gray-100 rounded-md transition w-full sm:w-auto text-center"
             >
               Cancel
             </button>
@@ -310,14 +310,14 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               <button
                 type="button"
                 onClick={handleSaveAndNew}
-                className="px-4 py-2 text-sm font-mono border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md transition"
+                className="px-4 py-2 text-sm font-mono border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md transition w-full sm:w-auto text-center"
               >
                 Save & New
               </button>
             )}
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-mono bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition shadow-xs"
+              className="px-5 py-2 text-sm font-mono bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition shadow-xs w-full sm:w-auto text-center"
             >
               {isEditing ? "Save Changes" : "Create"}
             </button>

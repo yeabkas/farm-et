@@ -17,8 +17,8 @@ export function TransactionTable({
   onDelete,
 }: TransactionTableProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-visible shadow-xs font-mono">
-      <table className="w-full text-left border-collapse text-xs">
+    <div className="bg-white border border-gray-200 rounded-lg overflow-x-auto shadow-xs min-h-[300px] font-mono">
+      <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50 text-gray-600">
             <th className="p-3 w-8">
@@ -26,9 +26,9 @@ export function TransactionTable({
             </th>
             <th className="p-3">Date</th>
             <th className="p-3">Payee</th>
-            <th className="p-3">Category</th>
-            <th className="p-3">Description</th>
-            <th className="p-3">Type</th>
+            <th className="p-3 hidden sm:table-cell">Category</th>
+            <th className="p-3 hidden md:table-cell">Description</th>
+            <th className="p-3 hidden lg:table-cell">Type</th>
             <th className="p-3 text-right">Amount</th>
             <th className="p-3 w-8"></th>
           </tr>
@@ -51,11 +51,11 @@ export function TransactionTable({
                   {formattedDate}
                 </td>
                 <td className="p-3 text-gray-700">{tx.payeeCustomer || "--"}</td>
-                <td className="p-3 text-gray-700">{tx.category}</td>
-                <td className="p-3 text-gray-600 max-w-xs truncate">
+                <td className="p-3 text-gray-700 hidden sm:table-cell">{tx.category}</td>
+                <td className="p-3 text-gray-600 max-w-xs truncate hidden md:table-cell">
                   {tx.description || tx.associatedTo || "--"}
                 </td>
-                <td className="p-3">
+                <td className="p-3 hidden lg:table-cell">
                   <span
                     className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold text-white ${
                       isExpense ? "bg-red-500" : "bg-emerald-600"
