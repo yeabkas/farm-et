@@ -61,38 +61,10 @@ export function Topbar() {
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 px-6 flex items-center justify-between sticky top-0 z-10 font-mono">
-      {/* Search Input */}
-      <div className="flex items-center gap-2 w-72 bg-gray-100 px-3 py-1.5 rounded-lg border border-transparent focus-within:border-emerald-500 focus-within:bg-white transition-all">
-        <Search className="w-4 h-4 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search crops, livestock..."
-          className="bg-transparent text-xs text-gray-800 placeholder-gray-400 outline-none w-full"
-        />
-      </div>
 
-      {/* Right Controls: Quick Action, Notifications, Profile */}
+
+      {/* Right Controls: Profile */}
       <div className="flex items-center gap-4">
-        {/* Quick Action Button */}
-        <Link
-          href="/market/dashboard"
-          className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition shadow-xs"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>New Record</span>
-        </Link>
-
-        {/* Notifications Button */}
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition"
-        >
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-        </button>
-
-        <div className="h-6 w-px bg-gray-200" />
 
         {/* User Profile Dropdown */}
         <div className="relative" ref={dropdownRef}>
