@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Auctions
     Route::get('/auctions', [\App\Http\Controllers\Api\AuctionController::class, 'index']);
+    Route::get('/auctions/me', [\App\Http\Controllers\Api\AuctionController::class, 'myAuctions']);
     Route::post('/auctions', [\App\Http\Controllers\Api\AuctionController::class, 'store']);
     Route::get('/auctions/{id}', [\App\Http\Controllers\Api\AuctionController::class, 'show']);
     Route::post('/auctions/{id}/bids', [\App\Http\Controllers\Api\BidController::class, 'store']);

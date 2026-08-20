@@ -129,6 +129,11 @@ export const fetchMarketListings = async () => {
   return response.data; // { data: [...], total: n }
 };
 
+export const fetchMyAuctions = async () => {
+  const response = await api.get('/auctions/me');
+  return response.data;
+};
+
 export const createAuction = async (data: {
   auctionable_type: 'animal' | 'crop';
   auctionable_id: number;

@@ -36,6 +36,47 @@ class AuctionController extends Controller
         return response()->json(['data' => $auctions, 'total' => $auctions->count()]);
     }
 
+    /**
+     * List all auctions created by the authenticated user.
+     */
+    public function myAuctions(Request $request): JsonResponse
+    {
+        $auctions = Auction::where('user_id', $request->user()->id)
+            ->with(['auctionable.user.farmProfile', 'highestBid.user', 'bids.user.farmProfile'])
+            ->latest()
+            ->get()
+            ->map(function ($auction) {
+                // Sort bids highest to lowest
+                $sortedBids = $auction->bids->sortByDesc('amount')->values()->map(function ($bid) {
+                    return [
+                        'id' => $bid->id,
+                        'amount' => $bid->amount,
+                        'created_at' => $bid->created_at,
+                        'user' => [
+                            'id' => $bid->user->id,
+                            'name' => $bid->user->name,
+                            'email' => $bid->user->email,
+                            'phone' => $bid->user->farmProfile ? $bid->user->farmProfile->phone_number : null,
+                        ],
+                    ];
+                });
+
+                return [
+                    'id' => $auction->id,
+                    'auctionable_type' => class_basename($auction->auctionable_type),
+                    'auctionable' => $auction->auctionable,
+                    'starting_price' => $auction->starting_price,
+                    'current_bid' => $auction->highestBid ? $auction->highestBid->amount : $auction->starting_price,
+                    'bid_count' => $auction->bids->count(),
+                    'end_time' => $auction->end_time,
+                    'status' => $auction->status,
+                    'bids' => $sortedBids,
+                ];
+            });
+
+        return response()->json(['data' => $auctions, 'total' => $auctions->count()]);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
