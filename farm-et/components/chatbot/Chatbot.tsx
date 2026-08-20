@@ -159,7 +159,7 @@ export function Chatbot({ context }: ChatbotProps) {
       <div
         className={cn(
           "bg-white w-80 sm:w-96 rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden transition-all duration-300 origin-bottom-right flex flex-col mb-4",
-          isOpen ? "scale-100 opacity-100 h-[500px]" : "scale-0 opacity-0 h-0"
+          isOpen ? "scale-100 opacity-100 h-[500px] pointer-events-auto" : "scale-0 opacity-0 h-0 pointer-events-none"
         )}
       >
         {/* Header */}
