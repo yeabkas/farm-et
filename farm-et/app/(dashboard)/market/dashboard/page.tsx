@@ -88,7 +88,10 @@ function timeLeft(dateStr: string): string {
     return `in ${mins} min${mins === 1 ? '' : 's'}`;
   }
   if (hours < 24) return `in ${hours} hr${hours === 1 ? '' : 's'}`;
-  return `in ${Math.floor(hours / 24)} day${Math.floor(hours / 24) === 1 ? '' : 's'}`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `in ${days} day${days === 1 ? '' : 's'}`;
+  const months = Math.floor(days / 30);
+  return `in ${months} month${months === 1 ? '' : 's'}`;
 }
 
 // ─── Contact Modal ────────────────────────────────────────────────────────────
