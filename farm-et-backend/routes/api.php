@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AnimalController;
 use App\Http\Controllers\Api\AuthController;
@@ -18,6 +21,22 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/market/listings', [MarketController::class, 'listings']);
 
 // ─── Protected Routes (require Sanctum token) ─────────────────────────────────
+
+Route::get('/migrate', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return response()->json([
+            'message' => 'Migrations ran successfully',
+            'output' => Artisan::output()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Migration failed',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
 Route::middleware('auth:sanctum')->group(function () {
 
     // Auth
