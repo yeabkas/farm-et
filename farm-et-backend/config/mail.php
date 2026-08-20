@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'smtp'),
+    'default' => 'smtp',
 
     /*
     |--------------------------------------------------------------------------
@@ -39,12 +39,12 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
-            'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', 'smtp.gmail.com'),
-            'port' => env('MAIL_PORT', 587),
-            'username' => env('MAIL_USERNAME', 'managefarm.et@gmail.com'),
-            'password' => env('MAIL_PASSWORD', 'zqkv uvvt edhd qngv'),
+            'scheme' => null,
+            'url' => null,
+            'host' => 'smtp.gmail.com',
+            'port' => 587,
+            'username' => 'managefarm.et@gmail.com',
+            'password' => 'zqkv uvvt edhd qngv',
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
@@ -111,8 +111,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'managefarm.et@gmail.com'),
-        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
+        'address' => 'managefarm.et@gmail.com',
+        'name' => 'FarmET Marketplace',
     ],
 
 ];
