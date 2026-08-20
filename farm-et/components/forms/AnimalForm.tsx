@@ -26,7 +26,7 @@ const defaultFormState = {
 };
 
 export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps) {
-  const [formData, setFormData] = useState<Omit<Animal, "id"> & { auctionDurationHours?: number, auctionStartingPrice?: number }>(() => {
+  const [formData, setFormData] = useState<Omit<Animal, "id"> & { auctionDurationHours?: number, auctionStartingPrice?: number, auctionDurationValue?: number, auctionDurationUnit?: string }>(() => {
     if (initialData) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id: _, ...rest } = initialData;
@@ -58,10 +58,20 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const createAnimalObject = () => ({
-    id: initialData?.id ?? 0,
-    ...formData,
-  });
+  const createAnimalObject = () => {
+    let computedHours = formData.auctionDurationHours;
+    if (formData.auctionDurationValue) {
+      if (formData.auctionDurationUnit === 'days') computedHours = formData.auctionDurationValue * 24;
+      else if (formData.auctionDurationUnit === 'months') computedHours = formData.auctionDurationValue * 24 * 30;
+      else computedHours = formData.auctionDurationValue;
+    }
+    
+    return {
+      id: initialData?.id ?? 0,
+      ...formData,
+      auctionDurationHours: computedHours,
+    };
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,15 +204,22 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
                   <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden bg-emerald-50 border-emerald-200">
                     <input
                       type="number"
-                      name="auctionDurationHours"
-                      placeholder="Default: 24"
-                      value={formData.auctionDurationHours ?? ""}
+                      name="auctionDurationValue"
+                      placeholder="Default: 24 (hours)"
+                      value={formData.auctionDurationValue ?? ""}
                       onChange={handleInputChange}
                       className="w-full p-2 text-sm outline-none bg-transparent"
                     />
-                    <span className="bg-emerald-100 border-l border-emerald-200 px-3 flex items-center text-xs text-emerald-700 font-mono">
-                      hours
-                    </span>
+                    <select
+                      name="auctionDurationUnit"
+                      value={formData.auctionDurationUnit || 'hours'}
+                      onChange={handleInputChange}
+                      className="bg-emerald-100 border-l border-emerald-200 px-2 flex items-center text-xs text-emerald-700 font-mono outline-none"
+                    >
+                      <option value="hours">hours</option>
+                      <option value="days">days</option>
+                      <option value="months">months</option>
+                    </select>
                   </div>
                 </div>
               </>

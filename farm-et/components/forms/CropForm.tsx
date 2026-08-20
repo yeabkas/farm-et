@@ -14,10 +14,11 @@ type CropFormState = {
   daysToMaturity?: number;
   harvestUnits: string;
   estimatedValue?: number;
-  estimatedValue?: number;
   isPerennial?: boolean;
   auctionStartingPrice?: number;
   auctionDurationHours?: number;
+  auctionDurationValue?: number;
+  auctionDurationUnit?: string;
 };
 
 interface CropFormProps {
@@ -74,10 +75,20 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
     }
   };
 
-  const createCropObject = () => ({
-    id: initialData?.id ?? 0,
-    ...formData,
-  });
+  const createCropObject = () => {
+    let computedHours = formData.auctionDurationHours;
+    if (formData.auctionDurationValue) {
+      if (formData.auctionDurationUnit === 'days') computedHours = formData.auctionDurationValue * 24;
+      else if (formData.auctionDurationUnit === 'months') computedHours = formData.auctionDurationValue * 24 * 30;
+      else computedHours = formData.auctionDurationValue;
+    }
+    
+    return {
+      id: initialData?.id ?? 0,
+      ...formData,
+      auctionDurationHours: computedHours,
+    };
+  };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -136,7 +147,7 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
                 <option value="Archived">Archived</option>
               </select>
             </div>
-            
+
             {formData.status === 'Auction' && (
               <>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
@@ -161,15 +172,22 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
                   <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden bg-emerald-50 border-emerald-200">
                     <input
                       type="number"
-                      name="auctionDurationHours"
-                      placeholder="Default: 24"
-                      value={formData.auctionDurationHours ?? ""}
+                      name="auctionDurationValue"
+                      placeholder="Default: 24 (hours)"
+                      value={formData.auctionDurationValue ?? ""}
                       onChange={handleInputChange}
                       className="w-full p-2 text-sm outline-none bg-transparent"
                     />
-                    <span className="bg-emerald-100 border-l border-emerald-200 px-3 flex items-center text-xs text-emerald-700 font-mono">
-                      hours
-                    </span>
+                    <select
+                      name="auctionDurationUnit"
+                      value={formData.auctionDurationUnit || 'hours'}
+                      onChange={handleInputChange}
+                      className="bg-emerald-100 border-l border-emerald-200 px-2 flex items-center text-xs text-emerald-700 font-mono outline-none"
+                    >
+                      <option value="hours">hours</option>
+                      <option value="days">days</option>
+                      <option value="months">months</option>
+                    </select>
                   </div>
                 </div>
               </>
