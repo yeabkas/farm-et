@@ -59,7 +59,7 @@ class CropController extends Controller
                 'auctionable_id' => $crop->id,
                 'starting_price' => $request->input('auctionStartingPrice', $crop->estimated_value ?? 0),
                 'status' => 'active',
-                'end_time' => now()->addHours($request->input('auctionDurationHours', 24)),
+                'end_time' => now()->addHours((int) $request->input('auctionDurationHours', 24)),
             ]);
         }
 
@@ -117,7 +117,7 @@ class CropController extends Controller
             if ($existing) {
                 $existing->update([
                     'starting_price' => $request->input('auctionStartingPrice', $crop->estimated_value ?? 0),
-                    'end_time' => now()->addHours($request->input('auctionDurationHours', 24)),
+                    'end_time' => now()->addHours((int) $request->input('auctionDurationHours', 24)),
                 ]);
             } else {
                 \App\Models\Auction::create([
@@ -126,7 +126,7 @@ class CropController extends Controller
                     'auctionable_id' => $crop->id,
                     'starting_price' => $request->input('auctionStartingPrice', $crop->estimated_value ?? 0),
                     'status' => 'active',
-                    'end_time' => now()->addHours($request->input('auctionDurationHours', 24)),
+                    'end_time' => now()->addHours((int) $request->input('auctionDurationHours', 24)),
                 ]);
             }
         }
