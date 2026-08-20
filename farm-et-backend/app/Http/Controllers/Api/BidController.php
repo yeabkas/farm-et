@@ -48,11 +48,14 @@ class BidController extends Controller
             'amount' => $validated['amount'],
         ]);
 
+        $mailErrors = [];
+
         // Send outbid notification if someone was outbid (best-effort, don't fail the bid)
         if ($highestBid && $highestBid->user_id !== $request->user()->id) {
             try {
                 Mail::to($highestBid->user->email)->send(new OutbidNotificationMail($auction, $validated['amount']));
             } catch (\Exception $e) {
+                $mailErrors[] = 'Outbid notification failed: ' . $e->getMessage();
                 \Illuminate\Support\Facades\Log::warning('Outbid notification failed: ' . $e->getMessage());
             }
         }
@@ -61,9 +64,14 @@ class BidController extends Controller
         try {
             Mail::to($auction->user->email)->send(new NewBidNotificationMail($auction, $validated['amount']));
         } catch (\Exception $e) {
+            $mailErrors[] = 'New bid notification failed: ' . $e->getMessage();
             \Illuminate\Support\Facades\Log::warning('New bid notification to auctioneer failed: ' . $e->getMessage());
         }
 
-        return response()->json(['message' => 'Bid placed successfully', 'bid' => $bid], 201);
+        return response()->json([
+            'message' => 'Bid placed successfully', 
+            'bid' => $bid,
+            'mail_errors' => $mailErrors
+        ], 201);
     }
 }
