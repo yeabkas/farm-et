@@ -43,4 +43,9 @@ class Animal extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function auction()
+    {
+        return $this->morphOne(Auction::class, 'auctionable')->where('status', 'active');
+    }
 }

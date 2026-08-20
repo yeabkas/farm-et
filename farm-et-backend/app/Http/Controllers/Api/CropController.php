@@ -27,7 +27,7 @@ class CropController extends Controller
     {
         $validated = $request->validate([
             'cropType' => 'required|string|max:100',
-            'status' => 'nullable|string|in:Active,For Sale,Sold,Archived',
+            'status' => 'nullable|string|in:Active,Auction,For Sale,Sold,Archived',
             'varietyStrain' => 'nullable|string|max:100',
             'botanicalName' => 'nullable|string|max:255',
             'description' => 'nullable|string',
@@ -76,7 +76,7 @@ class CropController extends Controller
 
         $validated = $request->validate([
             'cropType' => 'sometimes|string|max:100',
-            'status' => 'nullable|string|in:Active,For Sale,Sold,Archived',
+            'status' => 'nullable|string|in:Active,Auction,For Sale,Sold,Archived',
             'varietyStrain' => 'nullable|string|max:100',
             'botanicalName' => 'nullable|string|max:255',
             'description' => 'nullable|string',

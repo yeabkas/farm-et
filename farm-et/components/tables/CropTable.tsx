@@ -152,13 +152,15 @@ export function CropTable({
                   <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full ${
                     crop.status === "For Sale"
                       ? "bg-amber-100 text-amber-800 border border-amber-300"
+                      : crop.status === "Auction"
+                      ? "bg-purple-100 text-purple-800 border border-purple-300"
                       : crop.status === "Sold"
                       ? "bg-gray-200 text-gray-500 border border-gray-300"
                       : crop.status === "Archived"
                       ? "bg-red-50 text-red-400 border border-red-200"
                       : "bg-emerald-100 text-emerald-700 border border-emerald-200"
                   }`}>
-                    {crop.status === "For Sale" ? "🏷️ For Sale" : (crop.status ?? "Active")}
+                    {crop.status === "For Sale" ? "🏷️ For Sale" : crop.status === "Auction" ? "🔨 Auction" : (crop.status ?? "Active")}
                   </span>
                 </td>
 

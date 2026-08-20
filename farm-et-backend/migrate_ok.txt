@@ -1,0 +1,1 @@
+﻿{"output":"\n   INFO  Running migrations.  \n\n  2026_08_19_155600_create_auctions_table ...................... 230.23ms DONE\n  2026_08_19_155601_create_bids_table .......................... 130.16ms DONE\n\n"}

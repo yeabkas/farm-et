@@ -7,7 +7,49 @@ import { CropHeader } from "@/components/headers/CropHeader";
 import { CropTable } from "@/components/tables/CropTable";
 import { CropEmptyState } from "@/components/emptyStates/CropEmptyState";
 import api from "@/lib/api";
+import { createAuction } from "@/lib/services";
 import { CheckCircle, AlertCircle, X } from "lucide-react";
+
+function SellModal({ crop, onClose, onConfirm }: { crop: Crop, onClose: () => void, onConfirm: (type: 'sale' | 'auction', durationHours?: number, price?: number) => void }) {
+  const [type, setType] = useState<'sale' | 'auction'>('sale');
+  const [duration, setDuration] = useState<number>(24);
+  const [price, setPrice] = useState<number>(Number(crop.estimatedValue) || 0);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+        <h3 className="text-lg font-bold mb-4">List {crop.cropType} on Marketplace</h3>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Listing Type</label>
+            <select value={type} onChange={(e) => setType(e.target.value as any)} className="w-full border rounded-md p-2 outline-none focus:border-emerald-500">
+              <option value="sale">Fixed Price Sale</option>
+              <option value="auction">Auction</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-1">{type === 'auction' ? 'Starting Price (ETB)' : 'Price (ETB)'}</label>
+            <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} className="w-full border rounded-md p-2 outline-none focus:border-emerald-500" />
+          </div>
+
+          {type === 'auction' && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Auction Duration (Hours)</label>
+              <input type="number" min="1" value={duration} onChange={(e) => setDuration(Number(e.target.value))} className="w-full border rounded-md p-2 outline-none focus:border-emerald-500" />
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6">
+          <button onClick={onClose} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">Cancel</button>
+          <button onClick={() => onConfirm(type, duration, price)} className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700">List Item</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 type Toast = { type: "success" | "info" | "error"; message: string } | null;
 
@@ -17,6 +59,7 @@ export default function CropsPage() {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingCrop, setEditingCrop] = useState<Crop | null>(null);
+  const [sellingCrop, setSellingCrop] = useState<Crop | null>(null);
   const [toast, setToast] = useState<Toast>(null);
 
   // Auto-dismiss toast after 3s
@@ -99,19 +142,36 @@ export default function CropsPage() {
     }
   };
 
-  const handleSellCrop = async (crop: Crop) => {
-    if (crop.status === "For Sale") {
-      setToast({ type: "info", message: `${crop.cropType} is already listed for sale.` });
+  const handleSellCrop = (crop: Crop) => {
+    if (crop.status === "For Sale" || crop.status === "Auction") {
+      setToast({ type: "info", message: `${crop.cropType} is already listed.` });
       return;
     }
+    setSellingCrop(crop);
+  };
+
+  const confirmSell = async (type: 'sale' | 'auction', durationHours?: number, price?: number) => {
+    if (!sellingCrop) return;
     try {
-      const res = await api.put(`/crops/${crop.id}`, { ...crop, status: "For Sale" });
-      const updated: Crop = res.data?.data ?? res.data;
-      setCrops((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
-      setToast({ type: "success", message: `${crop.cropType} is now listed For Sale in the Marketplace! 🏷️` });
+      if (type === 'sale') {
+        const res = await api.put(`/crops/${sellingCrop.id}`, { ...sellingCrop, status: "For Sale", estimated_value: price });
+        const updated: Crop = res.data?.data ?? res.data;
+        setCrops((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+        setToast({ type: "success", message: `${sellingCrop.cropType} is now listed For Sale! 🏷️` });
+      } else {
+        await createAuction({
+          auctionable_type: 'crop',
+          auctionable_id: Number(sellingCrop.id),
+          starting_price: price || 0,
+          duration_hours: durationHours
+        });
+        setCrops((prev) => prev.map((c) => (c.id === sellingCrop.id ? { ...c, status: "Auction", estimatedValue: price } : c)));
+        setToast({ type: "success", message: `${sellingCrop.cropType} is now listed for Auction! 🔨` });
+      }
+      setSellingCrop(null);
     } catch (error) {
-      console.error("Failed to mark crop for sale:", error);
-      setToast({ type: "error", message: "Could not update status. Please try again." });
+      console.error("Failed to list crop:", error);
+      setToast({ type: "error", message: "Could not list item. Please try again." });
     }
   };
 
@@ -162,6 +222,14 @@ export default function CropsPage() {
           onEdit={handleEditCrop}
           onSell={handleSellCrop}
           onDelete={handleDeleteCrop}
+        />
+      )}
+
+      {sellingCrop && (
+        <SellModal
+          crop={sellingCrop}
+          onClose={() => setSellingCrop(null)}
+          onConfirm={confirmSell}
         />
       )}
     </div>

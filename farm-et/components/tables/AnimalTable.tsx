@@ -95,11 +95,13 @@ export function AnimalTable({ animals, onEdit, onSell, onDuplicate, onDelete }: 
                   <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full ${
                     animal.status === "For Sale"
                       ? "bg-amber-100 text-amber-800 border border-amber-300"
+                      : animal.status === "Auction"
+                      ? "bg-purple-100 text-purple-800 border border-purple-300"
                       : animal.status === "Sold"
                       ? "bg-gray-200 text-gray-500 border border-gray-300"
                       : "bg-emerald-100 text-emerald-700 border border-emerald-200"
                   }`}>
-                    {animal.status === "For Sale" ? "🏷️ For Sale" : animal.status}
+                    {animal.status === "For Sale" ? "🏷️ For Sale" : animal.status === "Auction" ? "🔨 Auction" : animal.status}
                   </span>
                 </td>
                 <td className="p-3 text-emerald-600 hidden sm:table-cell">{animal.animalType}</td>

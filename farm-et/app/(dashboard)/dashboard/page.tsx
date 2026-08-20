@@ -1,7 +1,8 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { fetchFinancialSummary } from '@/lib/services';
+import { fetchFinancialSummary, fetchCrops, fetchAnimals } from '@/lib/services';
+import { AiInsightsCard } from '@/components/dashboard/AiInsightsCard';
 
 export default function OverviewDashboardPage() {
   // useQuery handles loading/error states without useEffect
@@ -10,7 +11,24 @@ export default function OverviewDashboardPage() {
     queryFn: () => fetchFinancialSummary(2026),
   });
 
+  const { data: cropsResponse } = useQuery({
+    queryKey: ['crops'],
+    queryFn: fetchCrops,
+  });
+
+  const { data: animalsResponse } = useQuery({
+    queryKey: ['animals'],
+    queryFn: fetchAnimals,
+  });
+
   const totals = summaryData?.summary;
+  
+  // Handle various response structures (e.g. paginated vs raw array)
+  const cropsArray = Array.isArray(cropsResponse?.data) ? cropsResponse.data : (Array.isArray(cropsResponse) ? cropsResponse : []);
+  const activeCropsCount = cropsArray.filter((c: any) => c.status !== 'Harvested' && c.status !== 'Completed').length;
+
+  const animalsArray = Array.isArray(animalsResponse?.data) ? animalsResponse.data : (Array.isArray(animalsResponse) ? animalsResponse : []);
+  const activeAnimalsCount = animalsArray.filter((a: any) => a.status !== 'Sold' && a.status !== 'Deceased').length;
 
   if (isLoading) {
     return <div className="p-6 text-gray-500">Loading summary...</div>;
@@ -35,7 +53,7 @@ export default function OverviewDashboardPage() {
       </div>
 
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {/* Total Income */}
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-xs">
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -73,10 +91,22 @@ export default function OverviewDashboardPage() {
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
             Active Crops
           </p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">12 Plots</p>
-          <span className="text-xs text-green-600 font-medium">↑ 2 planted this week</span>
+          <p className="text-2xl font-bold text-gray-900 mt-2">{activeCropsCount} Plots</p>
+          <span className="text-xs text-green-600 font-medium">Live from API</span>
+        </div>
+
+        {/* Livestock */}
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-xs">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Livestock
+          </p>
+          <p className="text-2xl font-bold text-gray-900 mt-2">{activeAnimalsCount} Animals</p>
+          <span className="text-xs text-green-600 font-medium">Live from API</span>
         </div>
       </div>
+
+      {/* AI Insights */}
+      <AiInsightsCard />
     </div>
   );
 }

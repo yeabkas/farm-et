@@ -26,10 +26,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
     Route::post('/email/resend', [AuthController::class, 'resendOtp']);
 
-    // Onboarding / Farm Profile
-    Route::post('/onboarding', [OnboardingController::class, 'store']);
-    Route::put('/onboarding', [OnboardingController::class, 'update']);
-    Route::get('/onboarding', [OnboardingController::class, 'show']);
+    // Routes that require both authentication AND email verification
+    Route::middleware('verified')->group(function () {
+        // Onboarding / Farm Profile
+        Route::post('/onboarding', [OnboardingController::class, 'store']);
+        Route::put('/onboarding', [OnboardingController::class, 'update']);
+        Route::get('/onboarding', [OnboardingController::class, 'show']);
+    });
+
+    // Auctions
+    Route::get('/auctions', [\App\Http\Controllers\Api\AuctionController::class, 'index']);
+    Route::post('/auctions', [\App\Http\Controllers\Api\AuctionController::class, 'store']);
+    Route::get('/auctions/{id}', [\App\Http\Controllers\Api\AuctionController::class, 'show']);
+    Route::post('/auctions/{id}/bids', [\App\Http\Controllers\Api\BidController::class, 'store']);
 
     // Transactions
     Route::apiResource('transactions', TransactionController::class);
@@ -51,4 +60,48 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/admin/users/{id}/revoke', [AdminController::class, 'revokeAdmin']);
     Route::put('/admin/users/{id}/promote', [AdminController::class, 'promoteAdmin']);
     Route::put('/admin/users/{id}/reset-password', [AdminController::class, 'resetPassword']);
+});
+
+Route::get('/dev/otp', function() {
+    $user = \App\Models\User::orderBy('id', 'desc')->first();
+    return response()->json([
+        'email' => $user ? $user->email : null,
+        'otp' => $user ? $user->otp_code : null
+    ]);
+});
+
+Route::get('/dev/env', function () {
+    return response()->json([
+        'default' => config('database.default'),
+        'connections' => config('database.connections'),
+        'env_db_connection' => env('DB_CONNECTION'),
+    ]);
+});
+
+Route::get('/dev/testdb', function () {
+    try {
+        $conn = \Illuminate\Support\Facades\DB::connection();
+        return response()->json([
+            'connection_name' => $conn->getName(),
+            'driver_name' => $conn->getDriverName(),
+            'pdo_driver' => $conn->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME),
+            'schema_grammar' => get_class($conn->getSchemaGrammar()),
+            'tables' => $conn->getSchemaBuilder()->getTables(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
+Route::get('/dev/migrate', function() {
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    return response()->json(['output' => \Illuminate\Support\Facades\Artisan::output()]);
+});
+
+Route::get('/cron/resolve-auctions', function() {
+    \Illuminate\Support\Facades\Artisan::call('auctions:resolve');
+    return response()->json(['status' => 'success', 'output' => \Illuminate\Support\Facades\Artisan::output()]);
 });

@@ -6,6 +6,7 @@ import heroBg from "../public/hero-farm.jpg";
 import Image from "next/image";
 import { LandingHeader } from "@/components/layout/LandingHeader";
 import { LandingFooter } from "@/components/layout/LandingFooter";
+import { Chatbot } from "@/components/chatbot/Chatbot";
 
 export default function Home() {
   return (
@@ -181,6 +182,7 @@ export default function Home() {
       </main>
 
       <LandingFooter />
+      <Chatbot />
     </div>
   );
 }

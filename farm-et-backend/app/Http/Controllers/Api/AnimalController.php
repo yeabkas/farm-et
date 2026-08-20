@@ -31,7 +31,7 @@ class AnimalController extends Controller
             'breed' => 'nullable|string|max:100',
             'sex' => 'required|in:Male,Female',
             'age' => 'nullable|numeric|min:0',
-            'status' => 'required|in:Active,For Sale,Lactating,Lost,Off Farm,Quarantined,Sold,Weaning',
+            'status' => 'required|in:Active,Auction,For Sale,Lactating,Lost,Off Farm,Quarantined,Sold,Weaning',
             'neutered' => 'required|in:Neutered,Intact',
             'coloring' => 'nullable|string|max:100',
             'description' => 'nullable|string',
@@ -77,7 +77,7 @@ class AnimalController extends Controller
             'breed' => 'nullable|string|max:100',
             'sex' => 'sometimes|in:Male,Female',
             'age' => 'nullable|numeric|min:0',
-            'status' => 'sometimes|in:Active,For Sale,Lactating,Lost,Off Farm,Quarantined,Sold,Weaning',
+            'status' => 'sometimes|in:Active,Auction,For Sale,Lactating,Lost,Off Farm,Quarantined,Sold,Weaning',
             'neutered' => 'sometimes|in:Neutered,Intact',
             'coloring' => 'nullable|string|max:100',
             'description' => 'nullable|string',
@@ -97,7 +97,7 @@ class AnimalController extends Controller
     }
 
     /**
-     * Delete an animal (hard delete — row removed permanently).
+     * Delete an animal (hard delete â€” row removed permanently).
      * Note: Use status = "Sold" to mark a sale without deleting.
      */
     public function destroy(Request $request, Animal $animal)

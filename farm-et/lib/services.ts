@@ -86,6 +86,18 @@ export const fetchTransactions = async () => {
   return response.data;
 };
 
+// ─── Crop & Animal Services ────────────────────────────────────────────────────────────
+
+export const fetchCrops = async () => {
+  const response = await api.get('/crops');
+  return response.data;
+};
+
+export const fetchAnimals = async () => {
+  const response = await api.get('/animals');
+  return response.data;
+};
+
 export const createTransaction = async (data: {
   type: 'Income' | 'Expense';
   amount: number;
@@ -109,12 +121,32 @@ export const fetchFinancialSummary = async (year: number = new Date().getFullYea
   return response.data;
 };
 
-// ─── Market Listings (public) ─────────────────────────────────────────────────
+// ─── Market Listings & Auctions ───────────────────────────────────────────────
 
 export const fetchMarketListings = async () => {
   // This endpoint is public — no auth token needed
   const response = await api.get('/market/listings');
   return response.data; // { data: [...], total: n }
+};
+
+export const createAuction = async (data: {
+  auctionable_type: 'animal' | 'crop';
+  auctionable_id: number;
+  starting_price: number;
+  duration_hours?: number;
+}) => {
+  const response = await api.post('/auctions', data);
+  return response.data;
+};
+
+export const fetchAuctionDetails = async (auctionId: number) => {
+  const response = await api.get(`/auctions/${auctionId}`);
+  return response.data;
+};
+
+export const placeBid = async (auctionId: number, amount: number) => {
+  const response = await api.post(`/auctions/${auctionId}/bids`, { amount });
+  return response.data;
 };
 
 // ─── Admin Services (Restricted) ──────────────────────────────────────────────

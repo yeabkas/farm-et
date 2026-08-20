@@ -17,16 +17,23 @@ class MarketController extends Controller
      */
     public function listings(): JsonResponse
     {
-        // ─── Animals listed For Sale ──────────────────────────────────────
-        $animals = Animal::where('status', 'For Sale')
-            ->with('user.farmProfile')
+        // ─── Animals listed For Sale or Auction ───────────────────────────
+        $animals = Animal::whereIn('status', ['For Sale', 'Auction'])
+            ->with(['user.farmProfile', 'auction.highestBid', 'auction.bids'])
             ->get()
             ->map(function ($animal) {
                 $profile = $animal->user?->farmProfile;
+                $auction = $animal->auction;
+                $highestBid = $auction?->highestBid;
 
                 return [
                     'id' => $animal->id,
                     'listingType' => 'animal',
+                    'saleType' => $animal->status === 'Auction' ? 'auction' : 'sale',
+                    'auctionId' => $auction?->id,
+                    'currentBid' => $highestBid ? $highestBid->amount : ($auction ? $auction->starting_price : null),
+                    'bidCount' => $auction ? $auction->bids->count() : 0,
+                    'auctionEndTime' => $auction?->end_time,
                     'name' => $animal->name,
                     'category' => $animal->animal_type,
                     'breed' => $animal->breed,
@@ -46,16 +53,23 @@ class MarketController extends Controller
                 ];
             });
 
-        // ─── Crops listed For Sale ────────────────────────────────────────
-        $crops = Crop::where('status', 'For Sale')
-            ->with('user.farmProfile')
+        // ─── Crops listed For Sale or Auction ─────────────────────────────
+        $crops = Crop::whereIn('status', ['For Sale', 'Auction'])
+            ->with(['user.farmProfile', 'auction.highestBid', 'auction.bids'])
             ->get()
             ->map(function ($crop) {
                 $profile = $crop->user?->farmProfile;
+                $auction = $crop->auction;
+                $highestBid = $auction?->highestBid;
 
                 return [
                     'id' => $crop->id,
                     'listingType' => 'crop',
+                    'saleType' => $crop->status === 'Auction' ? 'auction' : 'sale',
+                    'auctionId' => $auction?->id,
+                    'currentBid' => $highestBid ? $highestBid->amount : ($auction ? $auction->starting_price : null),
+                    'bidCount' => $auction ? $auction->bids->count() : 0,
+                    'auctionEndTime' => $auction?->end_time,
                     'name' => $crop->crop_type,
                     'category' => $crop->variety_strain ?? $crop->crop_type,
                     'breed' => null,

@@ -1,14 +1,19 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { fetchMarketListings } from "@/lib/services";
-import { Search, SlidersHorizontal, Tag, MapPin, Package, X, ShoppingBag, Phone, Mail } from "lucide-react";
+import { fetchMarketListings, placeBid } from "@/lib/services";
+import { Search, SlidersHorizontal, Tag, MapPin, Package, X, ShoppingBag, Phone, Mail, Gavel } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Listing {
   id: number;
   listingType: "animal" | "crop";
+  saleType?: "sale" | "auction";
+  auctionId?: number | null;
+  currentBid?: number | null;
+  bidCount?: number;
+  auctionEndTime?: string | null;
   name: string;
   category: string;
   breed?: string | null;
@@ -74,13 +79,43 @@ function timeAgo(dateStr: string): string {
   return `${Math.floor(diff / 365)}y ago`;
 }
 
+function timeLeft(dateStr: string): string {
+  const diff = new Date(dateStr).getTime() - Date.now();
+  if (diff <= 0) return "Ended";
+  const hours = Math.floor(diff / 3600000);
+  if (hours < 1) {
+    const mins = Math.floor(diff / 60000);
+    return `in ${mins} min${mins === 1 ? '' : 's'}`;
+  }
+  if (hours < 24) return `in ${hours} hr${hours === 1 ? '' : 's'}`;
+  return `in ${Math.floor(hours / 24)} day${Math.floor(hours / 24) === 1 ? '' : 's'}`;
+}
+
 // ─── Contact Modal ────────────────────────────────────────────────────────────
 
-function ContactModal({ listing, onClose }: { listing: Listing; onClose: () => void }) {
+function ContactModal({ listing, onClose, onBidSuccess }: { listing: Listing; onClose: () => void; onBidSuccess?: () => void }) {
+  const [bidAmount, setBidAmount] = useState<number>((listing.currentBid || listing.estimatedValue || 0) + 100);
+  const [isBidding, setIsBidding] = useState(false);
+  const [error, setError] = useState('');
+
+  const handlePlaceBid = async () => {
+    if (!listing.auctionId) return;
+    setIsBidding(true);
+    setError('');
+    try {
+      await placeBid(listing.auctionId, bidAmount);
+      onBidSuccess?.();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to place bid');
+    } finally {
+      setIsBidding(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-fadeIn">
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-fadeIn max-h-[90vh] overflow-y-auto">
         <button onClick={onClose} className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100">
           <X className="w-5 h-5 text-gray-500" />
         </button>
@@ -101,12 +136,39 @@ function ContactModal({ listing, onClose }: { listing: Listing; onClose: () => v
           <div className="flex items-center gap-2">
             <Package className="w-4 h-4 text-emerald-600 shrink-0" />
             <span className="text-sm font-semibold text-emerald-700">
-              {formatPrice(listing.estimatedValue, listing.harvestUnits)}
+              {listing.saleType === 'auction' 
+                ? `Current Bid: ${formatPrice(listing.currentBid, listing.harvestUnits)}`
+                : formatPrice(listing.estimatedValue, listing.harvestUnits)}
             </span>
           </div>
         </div>
         {listing.description && (
           <p className="text-sm text-gray-600 mb-5 leading-relaxed">{listing.description}</p>
+        )}
+
+        {listing.saleType === 'auction' && new Date(listing.auctionEndTime || '') > new Date() && (
+          <div className="mb-5 p-4 border border-amber-200 bg-amber-50 rounded-xl">
+            <h4 className="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2">
+              <Gavel className="w-4 h-4" /> Place a Bid
+            </h4>
+            <div className="flex gap-2">
+              <input 
+                type="number" 
+                value={bidAmount} 
+                onChange={e => setBidAmount(Number(e.target.value))}
+                className="flex-1 border border-amber-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-amber-400 bg-white"
+              />
+              <button 
+                onClick={handlePlaceBid}
+                disabled={isBidding}
+                className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors"
+              >
+                {isBidding ? 'Bidding...' : 'Bid'}
+              </button>
+            </div>
+            {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
+            <p className="text-xs text-amber-700 mt-2 font-medium">Auction ends {timeLeft(listing.auctionEndTime!)}</p>
+          </div>
         )}
 
         <div className="space-y-3 mb-5">
@@ -200,11 +262,37 @@ function ProductCard({ listing, onContact }: { listing: Listing; onContact: () =
 
         {/* Price */}
         <div className="mt-auto pt-2 border-t border-gray-100">
-          <p className="text-lg font-extrabold text-gray-900">
-            {formatPrice(listing.estimatedValue, listing.harvestUnits)}
-          </p>
+          {listing.saleType === 'auction' ? (
+            <div>
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Current Bid</p>
+                {(listing.bidCount ?? 0) > 0 && (
+                  <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded-full">
+                    {listing.bidCount} bid{listing.bidCount === 1 ? '' : 's'}
+                  </span>
+                )}
+              </div>
+              <p className="text-lg font-extrabold text-amber-600">
+                {formatPrice(listing.currentBid, listing.harvestUnits)}
+              </p>
+              {listing.auctionEndTime && new Date(listing.auctionEndTime) > new Date() ? (
+                <p className="text-xs text-red-500 font-semibold mt-0.5">
+                  Ends {timeLeft(listing.auctionEndTime)}
+                </p>
+              ) : (
+                <p className="text-xs text-gray-500 font-semibold mt-0.5">Auction Ended</p>
+              )}
+            </div>
+          ) : (
+            <div>
+              <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Price</p>
+              <p className="text-lg font-extrabold text-gray-900">
+                {formatPrice(listing.estimatedValue, listing.harvestUnits)}
+              </p>
+            </div>
+          )}
           {listing.matureWeight && (
-            <p className="text-xs text-gray-500">Weight: {listing.matureWeight} kg</p>
+            <p className="text-xs text-gray-500 mt-1">Weight: {listing.matureWeight} kg</p>
           )}
         </div>
 
@@ -219,9 +307,15 @@ function ProductCard({ listing, onContact }: { listing: Listing; onContact: () =
         {/* CTA */}
         <button
           onClick={onContact}
-          className="w-full mt-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-sm font-semibold rounded-xl transition-colors"
+          className={`w-full mt-1 py-2.5 text-white text-sm font-semibold rounded-xl transition-colors ${
+            listing.saleType === 'auction' && listing.auctionEndTime && new Date(listing.auctionEndTime) > new Date()
+              ? 'bg-amber-500 hover:bg-amber-600 active:bg-amber-700'
+              : 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800'
+          }`}
         >
-          Contact Seller
+          {listing.saleType === 'auction' && listing.auctionEndTime && new Date(listing.auctionEndTime) > new Date()
+            ? '🔨 Place Bid'
+            : 'Contact Seller'}
         </button>
       </div>
     </div>
@@ -485,6 +579,13 @@ export default function MarketDashboard() {
         <ContactModal
           listing={selectedListing}
           onClose={() => setSelectedListing(null)}
+          onBidSuccess={() => {
+            setSelectedListing(null);
+            setLoading(true);
+            fetchMarketListings()
+              .then((res) => setListings(res.data ?? []))
+              .finally(() => setLoading(false));
+          }}
         />
       )}
 
