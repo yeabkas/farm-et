@@ -154,12 +154,12 @@ export function Chatbot({ context }: ChatbotProps) {
   };
 
   return (
-    <div className="fixed bottom-3 right-3 z-50 flex flex-col items-end">
+    <div className="fixed bottom-3 right-3 z-50 flex flex-col items-end pointer-events-none">
       {/* Chat Window */}
       <div
         className={cn(
-          "bg-white w-80 sm:w-96 rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden transition-all duration-300 origin-bottom-right flex flex-col mb-4",
-          isOpen ? "scale-100 opacity-100 h-[500px] pointer-events-auto" : "scale-0 opacity-0 h-0 pointer-events-none"
+          "bg-white w-80 sm:w-96 rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden transition-all duration-300 origin-bottom-right flex flex-col mb-4 pointer-events-auto",
+          isOpen ? "scale-100 opacity-100 h-[500px]" : "scale-0 opacity-0 h-0"
         )}
       >
         {/* Header */}
@@ -252,7 +252,7 @@ export function Chatbot({ context }: ChatbotProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-14 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95",
+          "pointer-events-auto w-14 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95",
           isOpen && "bg-emerald-700 rotate-90"
         )}
         aria-label="Toggle chat"
