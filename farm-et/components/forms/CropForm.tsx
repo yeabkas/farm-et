@@ -127,6 +127,7 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm focus:ring-1 focus:ring-emerald-500 outline-none bg-white"
               >
                 <option value="Active">Active</option>
+                <option value="Auction">Auction</option>
                 <option value="For Sale">For Sale</option>
                 <option value="Sold">Sold</option>
                 <option value="Archived">Archived</option>

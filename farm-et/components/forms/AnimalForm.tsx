@@ -143,6 +143,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
                 className="flex-1 border border-gray-300 rounded-md p-2 text-sm bg-white focus:ring-1 focus:ring-emerald-500 outline-none"
               >
                 <option value="Active">Active</option>
+                <option value="Auction">Auction</option>
                 <option value="For Sale">For Sale</option>
                 <option value="Lactating">Lactating</option>
                 <option value="Lost">Lost</option>
