@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\NewBidNotificationMail;
 use App\Mail\OutbidNotificationMail;
 use App\Models\Auction;
 use App\Models\Bid;
@@ -54,6 +55,13 @@ class BidController extends Controller
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::warning('Outbid notification failed: ' . $e->getMessage());
             }
+        }
+
+        // Send new bid notification to the auctioneer
+        try {
+            Mail::to($auction->user->email)->send(new NewBidNotificationMail($auction, $validated['amount']));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('New bid notification to auctioneer failed: ' . $e->getMessage());
         }
 
         return response()->json(['message' => 'Bid placed successfully', 'bid' => $bid], 201);
