@@ -50,6 +50,17 @@ class CropController extends Controller
 
         $crop = $request->user()->crops()->create($snake);
 
+        if ($crop->status === 'Auction') {
+            \App\Models\Auction::create([
+                'user_id' => $crop->user_id,
+                'auctionable_type' => \App\Models\Crop::class,
+                'auctionable_id' => $crop->id,
+                'starting_price' => $crop->estimated_value ?? 0,
+                'status' => 'active',
+                'end_time' => now()->addHours(24),
+            ]);
+        }
+
         return new CropResource($crop);
     }
 
@@ -93,6 +104,23 @@ class CropController extends Controller
         )->toArray();
 
         $crop->update($snake);
+
+        if ($crop->status === 'Auction') {
+            $existing = \App\Models\Auction::where('auctionable_type', \App\Models\Crop::class)
+                ->where('auctionable_id', $crop->id)
+                ->where('status', 'active')
+                ->first();
+            if (!$existing) {
+                \App\Models\Auction::create([
+                    'user_id' => $crop->user_id,
+                    'auctionable_type' => \App\Models\Crop::class,
+                    'auctionable_id' => $crop->id,
+                    'starting_price' => $crop->estimated_value ?? 0,
+                    'status' => 'active',
+                    'end_time' => now()->addHours(24),
+                ]);
+            }
+        }
 
         return new CropResource($crop);
     }

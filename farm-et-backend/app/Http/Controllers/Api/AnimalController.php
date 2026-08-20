@@ -47,6 +47,17 @@ class AnimalController extends Controller
 
         $animal = $request->user()->animals()->create($snake);
 
+        if ($animal->status === 'Auction') {
+            \App\Models\Auction::create([
+                'user_id' => $animal->user_id,
+                'auctionable_type' => \App\Models\Animal::class,
+                'auctionable_id' => $animal->id,
+                'starting_price' => $animal->estimated_value ?? 0,
+                'status' => 'active',
+                'end_time' => now()->addHours(24),
+            ]);
+        }
+
         return new AnimalResource($animal);
     }
 
@@ -92,6 +103,23 @@ class AnimalController extends Controller
         )->toArray();
 
         $animal->update($snake);
+
+        if ($animal->status === 'Auction') {
+            $existing = \App\Models\Auction::where('auctionable_type', \App\Models\Animal::class)
+                ->where('auctionable_id', $animal->id)
+                ->where('status', 'active')
+                ->first();
+            if (!$existing) {
+                \App\Models\Auction::create([
+                    'user_id' => $animal->user_id,
+                    'auctionable_type' => \App\Models\Animal::class,
+                    'auctionable_id' => $animal->id,
+                    'starting_price' => $animal->estimated_value ?? 0,
+                    'status' => 'active',
+                    'end_time' => now()->addHours(24),
+                ]);
+            }
+        }
 
         return new AnimalResource($animal);
     }
