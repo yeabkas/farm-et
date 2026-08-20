@@ -9,7 +9,7 @@ class CropResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'userId' => $this->user_id,
             'cropType' => $this->crop_type,
@@ -26,5 +26,15 @@ class CropResource extends JsonResource
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
         ];
+
+        if ($this->relationLoaded('auction') && $this->auction) {
+            $data['auctionStartingPrice'] = $this->auction->starting_price;
+            $data['auctionDurationHours'] = max(1, now()->diffInHours($this->auction->end_time, false));
+            if ($data['auctionDurationHours'] < 0) {
+                $data['auctionDurationHours'] = 0; // auction ended
+            }
+        }
+
+        return $data;
     }
 }

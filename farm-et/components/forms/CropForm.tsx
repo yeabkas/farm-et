@@ -50,6 +50,9 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
         ...rest,
         status: status ?? "Active",
         harvestUnits: harvestUnits ?? "kg",
+        auctionStartingPrice: (rest as any).auctionStartingPrice,
+        auctionDurationValue: (rest as any).auctionDurationHours,
+        auctionDurationUnit: 'hours',
       };
     }
     return defaultFormState;

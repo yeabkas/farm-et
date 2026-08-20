@@ -28,5 +28,15 @@ class AnimalResource extends JsonResource
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
         ];
+
+        if ($this->relationLoaded('auction') && $this->auction) {
+            $data['auctionStartingPrice'] = $this->auction->starting_price;
+            $data['auctionDurationHours'] = max(1, now()->diffInHours($this->auction->end_time, false));
+            if ($data['auctionDurationHours'] < 0) {
+                $data['auctionDurationHours'] = 0; // auction ended
+            }
+        }
+
+        return $data;
     }
 }

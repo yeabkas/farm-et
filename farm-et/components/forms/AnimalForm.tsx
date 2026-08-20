@@ -44,6 +44,9 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
         veterinarian: rest.veterinarian ?? "",
         matureWeight: rest.matureWeight ?? "",
         estimatedValue: rest.estimatedValue ?? "",
+        auctionStartingPrice: (rest as any).auctionStartingPrice,
+        auctionDurationValue: (rest as any).auctionDurationHours,
+        auctionDurationUnit: 'hours',
       };
     }
     return defaultFormState;

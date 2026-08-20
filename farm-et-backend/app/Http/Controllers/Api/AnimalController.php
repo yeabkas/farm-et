@@ -16,7 +16,7 @@ class AnimalController extends Controller
     public function index(Request $request)
     {
         return AnimalResource::collection(
-            $request->user()->animals()->latest()->get()
+            $request->user()->animals()->with('auction')->latest()->get()
         );
     }
 
@@ -72,6 +72,8 @@ class AnimalController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+        $animal->load('auction');
+
         return new AnimalResource($animal);
     }
 
@@ -114,10 +116,16 @@ class AnimalController extends Controller
                 ->where('status', 'active')
                 ->first();
             if ($existing) {
-                $existing->update([
-                    'starting_price' => $request->input('auctionStartingPrice', $animal->estimated_value ?? 0),
-                    'end_time' => now()->addHours((int) $request->input('auctionDurationHours', 24)),
-                ]);
+                $updateData = [];
+                if ($request->has('auctionStartingPrice')) {
+                    $updateData['starting_price'] = $request->input('auctionStartingPrice');
+                }
+                if ($request->has('auctionDurationHours') && $request->input('auctionDurationHours') !== null) {
+                    $updateData['end_time'] = now()->addHours((int) $request->input('auctionDurationHours'));
+                }
+                if (!empty($updateData)) {
+                    $existing->update($updateData);
+                }
             } else {
                 \App\Models\Auction::create([
                     'user_id' => $animal->user_id,
@@ -128,6 +136,11 @@ class AnimalController extends Controller
                     'end_time' => now()->addHours((int) $request->input('auctionDurationHours', 24)),
                 ]);
             }
+        } else {
+            \App\Models\Auction::where('auctionable_type', \App\Models\Animal::class)
+                ->where('auctionable_id', $animal->id)
+                ->where('status', 'active')
+                ->update(['status' => 'cancelled']);
         }
 
         return new AnimalResource($animal);

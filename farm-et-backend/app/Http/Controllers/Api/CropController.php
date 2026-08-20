@@ -16,7 +16,7 @@ class CropController extends Controller
     public function index(Request $request)
     {
         return CropResource::collection(
-            $request->user()->crops()->latest()->get()
+            $request->user()->crops()->with('auction')->latest()->get()
         );
     }
 
@@ -75,6 +75,8 @@ class CropController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+        $crop->load('auction');
+
         return new CropResource($crop);
     }
 
@@ -115,10 +117,16 @@ class CropController extends Controller
                 ->where('status', 'active')
                 ->first();
             if ($existing) {
-                $existing->update([
-                    'starting_price' => $request->input('auctionStartingPrice', $crop->estimated_value ?? 0),
-                    'end_time' => now()->addHours((int) $request->input('auctionDurationHours', 24)),
-                ]);
+                $updateData = [];
+                if ($request->has('auctionStartingPrice')) {
+                    $updateData['starting_price'] = $request->input('auctionStartingPrice');
+                }
+                if ($request->has('auctionDurationHours') && $request->input('auctionDurationHours') !== null) {
+                    $updateData['end_time'] = now()->addHours((int) $request->input('auctionDurationHours'));
+                }
+                if (!empty($updateData)) {
+                    $existing->update($updateData);
+                }
             } else {
                 \App\Models\Auction::create([
                     'user_id' => $crop->user_id,
@@ -129,6 +137,11 @@ class CropController extends Controller
                     'end_time' => now()->addHours((int) $request->input('auctionDurationHours', 24)),
                 ]);
             }
+        } else {
+            \App\Models\Auction::where('auctionable_type', \App\Models\Crop::class)
+                ->where('auctionable_id', $crop->id)
+                ->where('status', 'active')
+                ->update(['status' => 'cancelled']);
         }
 
         return new CropResource($crop);
