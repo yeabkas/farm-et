@@ -13,9 +13,12 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Modify animals table to add 'Auction' to the status enum
-        // Since modifying enums directly can be tricky in some DBs via Blueprint,
-        // we'll use DB::statement for MySQL to alter the column.
-        DB::statement("ALTER TABLE animals MODIFY COLUMN status ENUM('Active', 'For Sale', 'Lactating', 'Lost', 'Off Farm', 'Quarantined', 'Sold', 'Weaning', 'Auction') DEFAULT 'Active'");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE animals DROP CONSTRAINT IF EXISTS animals_status_check');
+            DB::statement("ALTER TABLE animals ADD CONSTRAINT animals_status_check CHECK (status IN ('Active', 'For Sale', 'Lactating', 'Lost', 'Off Farm', 'Quarantined', 'Sold', 'Weaning', 'Auction'))");
+        } else {
+            DB::statement("ALTER TABLE animals MODIFY COLUMN status ENUM('Active', 'For Sale', 'Lactating', 'Lost', 'Off Farm', 'Quarantined', 'Sold', 'Weaning', 'Auction') DEFAULT 'Active'");
+        }
 
         // 2. Add status column to crops table if it doesn't exist
         Schema::table('crops', function (Blueprint $table) {

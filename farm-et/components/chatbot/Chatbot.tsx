@@ -44,7 +44,7 @@ export function Chatbot({ context }: ChatbotProps) {
 
     const userMessage: ChatMessage = { id: Date.now().toString(), role: 'user', content: inputValue };
     const newMessages = [...messages, userMessage];
-    
+
     setMessages(newMessages);
     setInputValue('');
     setIsLoading(true);
@@ -58,7 +58,7 @@ export function Chatbot({ context }: ChatbotProps) {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           messages: newMessages.map(m => ({
             ...m,
             content: cleanAIContent(m.content)
@@ -89,14 +89,14 @@ export function Chatbot({ context }: ChatbotProps) {
           const lines = buffer.split('\n');
           // Keep the last incomplete line in the buffer
           buffer = lines.pop() || '';
-          
+
           for (const line of lines) {
             if (line.startsWith('0:')) {
               try {
                 const textChunk = JSON.parse(line.substring(2));
                 aiContent += textChunk;
-                
-                setMessages(prev => 
+
+                setMessages(prev =>
                   prev.map(msg => msg.id === aiMessageId ? { ...msg, content: aiContent } : msg)
                 );
               } catch {
@@ -104,8 +104,8 @@ export function Chatbot({ context }: ChatbotProps) {
               }
             } else if (line.trim().length > 0 && !line.match(/^[0-9]:/)) {
               aiContent += line + '\n';
-              setMessages(prev => 
-                prev.map(msg => 
+              setMessages(prev =>
+                prev.map(msg =>
                   msg.id === aiMessageId ? { ...msg, content: aiContent } : msg
                 )
               );
@@ -126,9 +126,9 @@ export function Chatbot({ context }: ChatbotProps) {
         } else if (!buffer.match(/^[0-9]:/)) {
           aiContent += buffer;
         }
-        
-        setMessages(prev => 
-          prev.map(msg => 
+
+        setMessages(prev =>
+          prev.map(msg =>
             msg.id === aiMessageId ? { ...msg, content: aiContent } : msg
           )
         );
@@ -154,7 +154,7 @@ export function Chatbot({ context }: ChatbotProps) {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-3 right-3 z-50 flex flex-col items-end">
       {/* Chat Window */}
       <div
         className={cn(
@@ -194,8 +194,8 @@ export function Chatbot({ context }: ChatbotProps) {
                 key={m.id}
                 className={cn(
                   "max-w-[85%] rounded-2xl p-3 text-sm",
-                  m.role === 'user' 
-                    ? "bg-emerald-600 text-white self-end rounded-br-sm" 
+                  m.role === 'user'
+                    ? "bg-emerald-600 text-white self-end rounded-br-sm"
                     : "bg-white border border-gray-200 text-gray-800 self-start rounded-bl-sm shadow-sm"
                 )}
               >
