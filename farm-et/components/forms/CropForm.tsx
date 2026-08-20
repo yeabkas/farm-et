@@ -14,7 +14,10 @@ type CropFormState = {
   daysToMaturity?: number;
   harvestUnits: string;
   estimatedValue?: number;
+  estimatedValue?: number;
   isPerennial?: boolean;
+  auctionStartingPrice?: number;
+  auctionDurationHours?: number;
 };
 
 interface CropFormProps {
@@ -133,6 +136,44 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
                 <option value="Archived">Archived</option>
               </select>
             </div>
+            
+            {formData.status === 'Auction' && (
+              <>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+                  <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Starting Price</label>
+                  <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden bg-emerald-50 border-emerald-200">
+                    <span className="bg-emerald-100 border-r border-emerald-200 px-3 flex items-center text-xs text-emerald-700 font-mono">
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      name="auctionStartingPrice"
+                      placeholder="Default: Est. Value"
+                      value={formData.auctionStartingPrice ?? ""}
+                      onChange={handleInputChange}
+                      className="w-full p-2 text-sm outline-none bg-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
+                  <label className="w-full sm:w-40 text-sm font-mono text-gray-700">Auction Duration</label>
+                  <div className="flex-1 flex border border-gray-300 rounded-md overflow-hidden bg-emerald-50 border-emerald-200">
+                    <input
+                      type="number"
+                      name="auctionDurationHours"
+                      placeholder="Default: 24"
+                      value={formData.auctionDurationHours ?? ""}
+                      onChange={handleInputChange}
+                      className="w-full p-2 text-sm outline-none bg-transparent"
+                    />
+                    <span className="bg-emerald-100 border-l border-emerald-200 px-3 flex items-center text-xs text-emerald-700 font-mono">
+                      hours
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0">
               <label className="w-full sm:w-40 text-sm font-mono text-gray-700">

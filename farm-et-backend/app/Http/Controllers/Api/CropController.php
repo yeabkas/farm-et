@@ -37,6 +37,8 @@ class CropController extends Controller
             'harvestUnits' => 'required|string|max:50',
             'saleWindow' => 'nullable|integer|min:0',
             'estimatedValue' => 'nullable|numeric|min:0',
+            'auctionStartingPrice' => 'nullable|numeric|min:0',
+            'auctionDurationHours' => 'nullable|integer|min:1',
         ]);
 
         // Set default status if not provided
@@ -55,9 +57,9 @@ class CropController extends Controller
                 'user_id' => $crop->user_id,
                 'auctionable_type' => \App\Models\Crop::class,
                 'auctionable_id' => $crop->id,
-                'starting_price' => $crop->estimated_value ?? 0,
+                'starting_price' => $request->input('auctionStartingPrice', $crop->estimated_value ?? 0),
                 'status' => 'active',
-                'end_time' => now()->addHours(24),
+                'end_time' => now()->addHours($request->input('auctionDurationHours', 24)),
             ]);
         }
 
@@ -97,6 +99,8 @@ class CropController extends Controller
             'harvestUnits' => 'sometimes|string|max:50',
             'saleWindow' => 'nullable|integer|min:0',
             'estimatedValue' => 'nullable|numeric|min:0',
+            'auctionStartingPrice' => 'nullable|numeric|min:0',
+            'auctionDurationHours' => 'nullable|integer|min:1',
         ]);
 
         $snake = collect($validated)->mapWithKeys(
@@ -115,9 +119,9 @@ class CropController extends Controller
                     'user_id' => $crop->user_id,
                     'auctionable_type' => \App\Models\Crop::class,
                     'auctionable_id' => $crop->id,
-                    'starting_price' => $crop->estimated_value ?? 0,
+                    'starting_price' => $request->input('auctionStartingPrice', $crop->estimated_value ?? 0),
                     'status' => 'active',
-                    'end_time' => now()->addHours(24),
+                    'end_time' => now()->addHours($request->input('auctionDurationHours', 24)),
                 ]);
             }
         }

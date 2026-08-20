@@ -39,6 +39,8 @@ class AnimalController extends Controller
             'veterinarian' => 'nullable|string|max:255',
             'matureWeight' => 'nullable|numeric|min:0',
             'estimatedValue' => 'nullable|numeric|min:0',
+            'auctionStartingPrice' => 'nullable|numeric|min:0',
+            'auctionDurationHours' => 'nullable|integer|min:1',
         ]);
 
         $snake = collect($validated)->mapWithKeys(
@@ -52,9 +54,9 @@ class AnimalController extends Controller
                 'user_id' => $animal->user_id,
                 'auctionable_type' => \App\Models\Animal::class,
                 'auctionable_id' => $animal->id,
-                'starting_price' => $animal->estimated_value ?? 0,
+                'starting_price' => $request->input('auctionStartingPrice', $animal->estimated_value ?? 0),
                 'status' => 'active',
-                'end_time' => now()->addHours(24),
+                'end_time' => now()->addHours($request->input('auctionDurationHours', 24)),
             ]);
         }
 
@@ -96,6 +98,8 @@ class AnimalController extends Controller
             'veterinarian' => 'nullable|string|max:255',
             'matureWeight' => 'nullable|numeric|min:0',
             'estimatedValue' => 'nullable|numeric|min:0',
+            'auctionStartingPrice' => 'nullable|numeric|min:0',
+            'auctionDurationHours' => 'nullable|integer|min:1',
         ]);
 
         $snake = collect($validated)->mapWithKeys(
@@ -114,9 +118,9 @@ class AnimalController extends Controller
                     'user_id' => $animal->user_id,
                     'auctionable_type' => \App\Models\Animal::class,
                     'auctionable_id' => $animal->id,
-                    'starting_price' => $animal->estimated_value ?? 0,
+                    'starting_price' => $request->input('auctionStartingPrice', $animal->estimated_value ?? 0),
                     'status' => 'active',
-                    'end_time' => now()->addHours(24),
+                    'end_time' => now()->addHours($request->input('auctionDurationHours', 24)),
                 ]);
             }
         }
