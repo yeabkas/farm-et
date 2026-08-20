@@ -113,7 +113,12 @@ class AnimalController extends Controller
                 ->where('auctionable_id', $animal->id)
                 ->where('status', 'active')
                 ->first();
-            if (!$existing) {
+            if ($existing) {
+                $existing->update([
+                    'starting_price' => $request->input('auctionStartingPrice', $animal->estimated_value ?? 0),
+                    'end_time' => now()->addHours($request->input('auctionDurationHours', 24)),
+                ]);
+            } else {
                 \App\Models\Auction::create([
                     'user_id' => $animal->user_id,
                     'auctionable_type' => \App\Models\Animal::class,
