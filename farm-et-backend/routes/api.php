@@ -21,21 +21,6 @@ Route::get('/market/listings', [MarketController::class, 'listings']);
 
 // ─── Protected Routes (require Sanctum token) ─────────────────────────────────
 
-Route::get('/migrate', function () {
-    try {
-        Artisan::call('migrate', ['--force' => true]);
-        return response()->json([
-            'message' => 'Migrations ran successfully',
-            'output' => Artisan::output()
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Migration failed',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-});
-
 Route::middleware('auth:sanctum')->group(function () {
 
     // Auth
