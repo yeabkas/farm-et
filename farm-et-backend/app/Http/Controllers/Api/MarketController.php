@@ -50,6 +50,7 @@ class MarketController extends Controller
                     'sellerPhone' => $profile?->phone_number,
                     'farmName' => $profile?->farm_name ?? 'Unknown Farm',
                     'createdAt' => $animal->created_at?->toDateString(),
+                    'images' => $animal->images,
                 ];
             });
 
@@ -86,6 +87,7 @@ class MarketController extends Controller
                     'sellerPhone' => $profile?->phone_number,
                     'farmName' => $profile?->farm_name ?? 'Unknown Farm',
                     'createdAt' => $crop->created_at?->toDateString(),
+                    'images' => $crop->images,
                 ];
             });
 
