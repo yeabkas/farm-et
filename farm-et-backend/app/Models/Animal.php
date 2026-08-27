@@ -25,6 +25,7 @@ class Animal extends Model
         'veterinarian',
         'mature_weight',
         'estimated_value',
+        'images',
     ];
 
     protected function casts(): array
@@ -33,6 +34,7 @@ class Animal extends Model
             'age' => 'float',
             'mature_weight' => 'float',
             'estimated_value' => 'float',
+            'images' => 'array',
         ];
     }
 

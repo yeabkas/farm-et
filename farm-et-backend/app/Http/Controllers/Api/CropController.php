@@ -7,6 +7,8 @@ use App\Http\Resources\CropResource;
 use App\Models\Crop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Cloudinary\Configuration\Configuration;
+use Cloudinary\Api\Upload\UploadApi;
 
 class CropController extends Controller
 {
@@ -39,6 +41,8 @@ class CropController extends Controller
             'estimatedValue' => 'nullable|numeric|min:0',
             'auctionStartingPrice' => 'nullable|numeric|min:0',
             'auctionDurationHours' => 'nullable|integer|min:1',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         // Set default status if not provided
@@ -46,9 +50,26 @@ class CropController extends Controller
             $validated['status'] = 'Active';
         }
 
-        $snake = collect($validated)->mapWithKeys(
+        $snake = collect($validated)->except('images')->mapWithKeys(
             fn ($value, $key) => [Str::snake($key) => $value]
         )->toArray();
+
+        // Handle Image Uploads via Cloudinary
+        if ($request->hasFile('images')) {
+            Configuration::instance(env('CLOUDINARY_URL'));
+            $uploadedUrls = [];
+            foreach ($request->file('images') as $file) {
+                try {
+                    $upload = (new UploadApi())->upload($file->getRealPath());
+                    $uploadedUrls[] = $upload['secure_url'];
+                } catch (\Exception $e) {
+                    \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+                }
+            }
+            if (!empty($uploadedUrls)) {
+                $snake['images'] = $uploadedUrls;
+            }
+        }
 
         $crop = $request->user()->crops()->create($snake);
 
@@ -103,11 +124,32 @@ class CropController extends Controller
             'estimatedValue' => 'nullable|numeric|min:0',
             'auctionStartingPrice' => 'nullable|numeric|min:0',
             'auctionDurationHours' => 'nullable|integer|min:1',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
-        $snake = collect($validated)->mapWithKeys(
+        $snake = collect($validated)->except('images')->mapWithKeys(
             fn ($value, $key) => [Str::snake($key) => $value]
         )->toArray();
+
+        // Handle Image Uploads via Cloudinary
+        if ($request->hasFile('images')) {
+            Configuration::instance(env('CLOUDINARY_URL'));
+            $uploadedUrls = [];
+            foreach ($request->file('images') as $file) {
+                try {
+                    $upload = (new UploadApi())->upload($file->getRealPath());
+                    $uploadedUrls[] = $upload['secure_url'];
+                } catch (\Exception $e) {
+                    \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+                }
+            }
+            if (!empty($uploadedUrls)) {
+                // If appending to existing images, we would merge. 
+                // Assuming replacement for simplicity on update.
+                $snake['images'] = $uploadedUrls;
+            }
+        }
 
         $crop->update($snake);
 

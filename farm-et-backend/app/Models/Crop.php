@@ -23,6 +23,7 @@ class Crop extends Model
         'harvest_units',
         'sale_window',
         'estimated_value',
+        'images',
     ];
 
     protected function casts(): array
@@ -32,6 +33,7 @@ class Crop extends Model
             'days_to_maturity' => 'integer',
             'sale_window' => 'integer',
             'estimated_value' => 'float',
+            'images' => 'array',
         ];
     }
 
