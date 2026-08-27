@@ -144,9 +144,7 @@ class AnimalController extends Controller
                 }
             }
             if (!empty($uploadedUrls)) {
-                // If appending to existing images, we would merge. 
-                // Assuming replacement for simplicity on update.
-                $snake['images'] = $uploadedUrls;
+                $snake['images'] = array_merge($animal->images ?? [], $uploadedUrls);
             }
         }
 
