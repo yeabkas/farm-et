@@ -61,6 +61,7 @@ export function CropForm({ initialData, onCancel, onSubmit, isSubmitting, upload
   });
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>(initialData?.images || []);
 
   const isEditing = Boolean(initialData);
 
@@ -68,6 +69,14 @@ export function CropForm({ initialData, onCancel, onSubmit, isSubmitting, upload
     if (e.target.files) {
       setSelectedFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
     }
+  };
+
+  const removeSelectedFile = (idx: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const removeExistingImage = (idx: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleInputChange = (
@@ -100,6 +109,7 @@ export function CropForm({ initialData, onCancel, onSubmit, isSubmitting, upload
       id: initialData?.id ?? 0,
       ...formData,
       auctionDurationHours: computedHours,
+      images: existingImages,
     };
   };
 
@@ -394,21 +404,35 @@ export function CropForm({ initialData, onCancel, onSubmit, isSubmitting, upload
                   className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
                 />
                 
-                {(selectedFiles.length > 0 || (initialData?.images && initialData.images.length > 0)) && (
+                {(selectedFiles.length > 0 || existingImages.length > 0) && (
                   <div className="mt-4 flex gap-4 flex-wrap">
                     {/* Existing Images */}
-                    {initialData?.images?.map((url: string, idx: number) => (
-                      <div key={`existing-${idx}`} className="relative w-24 h-24 border border-gray-200 rounded-md overflow-hidden bg-gray-50">
+                    {existingImages.map((url: string, idx: number) => (
+                      <div key={`existing-${idx}`} className="relative w-24 h-24 border border-gray-200 rounded-md overflow-hidden bg-gray-50 group">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="saved preview" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeExistingImage(idx)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
                       </div>
                     ))}
                     
                     {/* New Selected Files */}
                     {selectedFiles.map((file, idx) => (
-                      <div key={`new-${idx}`} className="relative w-24 h-24 border border-emerald-200 rounded-md overflow-hidden bg-gray-50 shadow-sm">
+                      <div key={`new-${idx}`} className="relative w-24 h-24 border border-emerald-200 rounded-md overflow-hidden bg-gray-50 shadow-sm group">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={URL.createObjectURL(file)} alt="new preview" className="w-full h-full object-cover opacity-80" />
+                        <button
+                          type="button"
+                          onClick={() => removeSelectedFile(idx)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
                       </div>
                     ))}
                   </div>
