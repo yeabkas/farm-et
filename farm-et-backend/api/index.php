@@ -29,6 +29,10 @@ putenv("APP_SERVICES_CACHE={$storage}/bootstrap/cache/services.php");
 
 require __DIR__.'/../vendor/autoload.php';
 
+// Force debug mode for troubleshooting
+$_ENV['APP_DEBUG'] = 'true';
+putenv('APP_DEBUG=true');
+
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
 // Tell Laravel to use /tmp for all storage paths
