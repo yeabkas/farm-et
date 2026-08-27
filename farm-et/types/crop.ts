@@ -31,4 +31,6 @@ export interface Crop {
 
   isPerennial?: boolean;        // Quick toggle to flag if crop replanting is needed annually
 
+  images?: string[];
+
 }

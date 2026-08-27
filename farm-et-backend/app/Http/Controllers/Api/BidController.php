@@ -9,6 +9,7 @@ use App\Models\Auction;
 use App\Models\Bid;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class BidController extends Controller
@@ -26,6 +27,7 @@ class BidController extends Controller
             if ($auction->status === 'active') {
                 $auction->update(['status' => 'ended']);
             }
+
             return response()->json(['message' => 'This auction has ended.'], 400);
         }
 
@@ -38,7 +40,7 @@ class BidController extends Controller
 
         if ($validated['amount'] <= $minBid) {
             return response()->json([
-                'message' => 'Your bid must be higher than the current highest bid/starting price of ETB ' . $minBid
+                'message' => 'Your bid must be higher than the current highest bid/starting price of ETB '.$minBid,
             ], 400);
         }
 
@@ -55,8 +57,8 @@ class BidController extends Controller
             try {
                 Mail::to($highestBid->user->email)->send(new OutbidNotificationMail($auction, $validated['amount']));
             } catch (\Exception $e) {
-                $mailErrors[] = 'Outbid notification failed: ' . $e->getMessage();
-                \Illuminate\Support\Facades\Log::warning('Outbid notification failed: ' . $e->getMessage());
+                $mailErrors[] = 'Outbid notification failed: '.$e->getMessage();
+                Log::warning('Outbid notification failed: '.$e->getMessage());
             }
         }
 
@@ -64,14 +66,14 @@ class BidController extends Controller
         try {
             Mail::to($auction->user->email)->send(new NewBidNotificationMail($auction, $validated['amount']));
         } catch (\Exception $e) {
-            $mailErrors[] = 'New bid notification failed: ' . $e->getMessage();
-            \Illuminate\Support\Facades\Log::warning('New bid notification to auctioneer failed: ' . $e->getMessage());
+            $mailErrors[] = 'New bid notification failed: '.$e->getMessage();
+            Log::warning('New bid notification to auctioneer failed: '.$e->getMessage());
         }
 
         return response()->json([
-            'message' => 'Bid placed successfully', 
+            'message' => 'Bid placed successfully',
             'bid' => $bid,
-            'mail_errors' => $mailErrors
+            'mail_errors' => $mailErrors,
         ], 201);
     }
 }

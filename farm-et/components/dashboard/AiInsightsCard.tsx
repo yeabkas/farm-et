@@ -40,6 +40,7 @@ export function AiInsightsCard() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchInsights();
   }, []);
 

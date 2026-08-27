@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Auction;
 use App\Models\Animal;
+use App\Models\Auction;
 use App\Models\Crop;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

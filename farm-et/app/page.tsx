@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ArrowRight, Sprout, Tractor, TrendingUp, ShoppingBag, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Sprout, TrendingUp, ShoppingBag, CheckCircle2 } from "lucide-react";
 
 import heroBg from "../public/hero-farm.jpg";
 import Image from "next/image";

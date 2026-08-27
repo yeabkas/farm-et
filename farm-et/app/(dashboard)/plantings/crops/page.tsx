@@ -23,7 +23,7 @@ function SellModal({ crop, onClose, onConfirm }: { crop: Crop, onClose: () => vo
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Listing Type</label>
-            <select value={type} onChange={(e) => setType(e.target.value as any)} className="w-full border rounded-md p-2 outline-none focus:border-emerald-500">
+            <select value={type} onChange={(e) => setType(e.target.value as 'sale' | 'auction')} className="w-full border rounded-md p-2 outline-none focus:border-emerald-500">
               <option value="sale">Fixed Price Sale</option>
               <option value="auction">Auction</option>
             </select>

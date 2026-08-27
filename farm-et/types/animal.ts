@@ -15,4 +15,5 @@ export interface Animal {
   veterinarian?: string;
   matureWeight?: number | string;
   estimatedValue?: number | string;
+  images?: string[];
 }

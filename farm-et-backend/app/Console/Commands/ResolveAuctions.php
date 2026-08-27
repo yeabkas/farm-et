@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 class ResolveAuctions extends Command
 {
     protected $signature = 'auctions:resolve';
+
     protected $description = 'Resolve ended auctions and send notifications';
 
     public function handle()
@@ -38,7 +39,7 @@ class ResolveAuctions extends Command
                     Mail::to($highestBid->user->email)->send(new AuctionEndedMail($auction, 'winner'));
                     Mail::to($seller->email)->send(new AuctionEndedMail($auction, 'seller'));
                 } catch (\Exception $e) {
-                    Log::warning('Auction ended notification failed for auction #' . $auction->id . ': ' . $e->getMessage());
+                    Log::warning('Auction ended notification failed for auction #'.$auction->id.': '.$e->getMessage());
                 }
             } else {
                 // No bids — return item to Active
@@ -48,6 +49,6 @@ class ResolveAuctions extends Command
             }
         }
 
-        $this->info('Resolved ' . $auctions->count() . ' auctions.');
+        $this->info('Resolved '.$auctions->count().' auctions.');
     }
 }

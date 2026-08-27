@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -22,7 +22,7 @@ return new class extends Migration
 
         // 2. Add status column to crops table if it doesn't exist
         Schema::table('crops', function (Blueprint $table) {
-            if (!Schema::hasColumn('crops', 'status')) {
+            if (! Schema::hasColumn('crops', 'status')) {
                 $table->string('status')->default('Active')->after('crop_type');
             }
         });
@@ -35,7 +35,7 @@ return new class extends Migration
     {
         // For animals, we'd normally revert the enum, but it's risky if data contains 'Auction'.
         // So we leave it or write a complex rollback.
-        
+
         Schema::table('crops', function (Blueprint $table) {
             if (Schema::hasColumn('crops', 'status')) {
                 $table->dropColumn('status');

@@ -1,15 +1,18 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AnimalController;
+use App\Http\Controllers\Api\AuctionController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BidController;
 use App\Http\Controllers\Api\CropController;
 use App\Http\Controllers\Api\MarketController;
 use App\Http\Controllers\Api\OnboardingController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\TransactionController;
+use App\Models\User;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 // ─── Public Routes ────────────────────────────────────────────────────────────
@@ -38,11 +41,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Auctions
-    Route::get('/auctions', [\App\Http\Controllers\Api\AuctionController::class, 'index']);
-    Route::get('/auctions/me', [\App\Http\Controllers\Api\AuctionController::class, 'myAuctions']);
-    Route::post('/auctions', [\App\Http\Controllers\Api\AuctionController::class, 'store']);
-    Route::get('/auctions/{id}', [\App\Http\Controllers\Api\AuctionController::class, 'show']);
-    Route::post('/auctions/{id}/bids', [\App\Http\Controllers\Api\BidController::class, 'store']);
+    Route::get('/auctions', [AuctionController::class, 'index']);
+    Route::get('/auctions/me', [AuctionController::class, 'myAuctions']);
+    Route::post('/auctions', [AuctionController::class, 'store']);
+    Route::get('/auctions/{id}', [AuctionController::class, 'show']);
+    Route::post('/auctions/{id}/bids', [BidController::class, 'store']);
 
     // Transactions
     Route::apiResource('transactions', TransactionController::class);
@@ -66,11 +69,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/admin/users/{id}/reset-password', [AdminController::class, 'resetPassword']);
 });
 
-Route::get('/dev/otp', function() {
-    $user = \App\Models\User::orderBy('id', 'desc')->first();
+Route::get('/dev/otp', function () {
+    $user = User::orderBy('id', 'desc')->first();
+
     return response()->json([
         'email' => $user ? $user->email : null,
-        'otp' => $user ? $user->otp_code : null
+        'otp' => $user ? $user->otp_code : null,
     ]);
 });
 
@@ -84,28 +88,31 @@ Route::get('/dev/env', function () {
 
 Route::get('/dev/testdb', function () {
     try {
-        $conn = \Illuminate\Support\Facades\DB::connection();
+        $conn = DB::connection();
+
         return response()->json([
             'connection_name' => $conn->getName(),
             'driver_name' => $conn->getDriverName(),
-            'pdo_driver' => $conn->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME),
+            'pdo_driver' => $conn->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME),
             'schema_grammar' => get_class($conn->getSchemaGrammar()),
             'tables' => $conn->getSchemaBuilder()->getTables(),
         ]);
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         return response()->json([
             'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
+            'trace' => $e->getTraceAsString(),
         ], 500);
     }
 });
 
-Route::get('/dev/migrate', function() {
-    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-    return response()->json(['output' => \Illuminate\Support\Facades\Artisan::output()]);
+Route::get('/dev/migrate', function () {
+    Artisan::call('migrate', ['--force' => true]);
+
+    return response()->json(['output' => Artisan::output()]);
 });
 
-Route::get('/cron/resolve-auctions', function() {
-    \Illuminate\Support\Facades\Artisan::call('auctions:resolve');
-    return response()->json(['status' => 'success', 'output' => \Illuminate\Support\Facades\Artisan::output()]);
+Route::get('/cron/resolve-auctions', function () {
+    Artisan::call('auctions:resolve');
+
+    return response()->json(['status' => 'success', 'output' => Artisan::output()]);
 });

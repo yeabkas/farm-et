@@ -108,8 +108,9 @@ function ContactModal({ listing, onClose, onBidSuccess }: { listing: Listing; on
     try {
       await placeBid(listing.auctionId, bidAmount);
       onBidSuccess?.();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to place bid');
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to place bid');
     } finally {
       setIsBidding(false);
     }

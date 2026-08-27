@@ -5,10 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AnimalResource;
 use App\Models\Animal;
+use App\Models\Auction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Cloudinary\Configuration\Configuration;
-use Cloudinary\Api\Upload\UploadApi;
 
 class AnimalController extends Controller
 {
@@ -44,36 +43,24 @@ class AnimalController extends Controller
             'auctionStartingPrice' => 'nullable|numeric|min:0',
             'auctionDurationHours' => 'nullable|integer|min:1',
             'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'images.*' => 'nullable|string|url',
         ]);
 
         $snake = collect($validated)->except('images')->mapWithKeys(
             fn ($value, $key) => [Str::snake($key) => $value]
         )->toArray();
 
-        // Handle Image Uploads via Cloudinary
-        if ($request->hasFile('images')) {
-            Configuration::instance(env('CLOUDINARY_URL'));
-            $uploadedUrls = [];
-            foreach ($request->file('images') as $file) {
-                try {
-                    $upload = (new UploadApi())->upload($file->getRealPath());
-                    $uploadedUrls[] = $upload['secure_url'];
-                } catch (\Exception $e) {
-                    \Log::error('Cloudinary upload failed: ' . $e->getMessage());
-                }
-            }
-            if (!empty($uploadedUrls)) {
-                $snake['images'] = $uploadedUrls;
-            }
+        // Images are uploaded client-side to Cloudinary; we just store the URLs
+        if (! empty($validated['images'])) {
+            $snake['images'] = $validated['images'];
         }
 
         $animal = $request->user()->animals()->create($snake);
 
         if ($animal->status === 'Auction') {
-            \App\Models\Auction::create([
+            Auction::create([
                 'user_id' => $animal->user_id,
-                'auctionable_type' => \App\Models\Animal::class,
+                'auctionable_type' => Animal::class,
                 'auctionable_id' => $animal->id,
                 'starting_price' => $request->input('auctionStartingPrice', $animal->estimated_value ?? 0),
                 'status' => 'active',
@@ -124,34 +111,22 @@ class AnimalController extends Controller
             'auctionStartingPrice' => 'nullable|numeric|min:0',
             'auctionDurationHours' => 'nullable|integer|min:1',
             'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'images.*' => 'nullable|string|url',
         ]);
 
         $snake = collect($validated)->except('images')->mapWithKeys(
             fn ($value, $key) => [Str::snake($key) => $value]
         )->toArray();
 
-        // Handle Image Uploads via Cloudinary
-        if ($request->hasFile('images')) {
-            Configuration::instance(env('CLOUDINARY_URL'));
-            $uploadedUrls = [];
-            foreach ($request->file('images') as $file) {
-                try {
-                    $upload = (new UploadApi())->upload($file->getRealPath());
-                    $uploadedUrls[] = $upload['secure_url'];
-                } catch (\Exception $e) {
-                    \Log::error('Cloudinary upload failed: ' . $e->getMessage());
-                }
-            }
-            if (!empty($uploadedUrls)) {
-                $snake['images'] = array_merge($animal->images ?? [], $uploadedUrls);
-            }
+        // Images are uploaded client-side to Cloudinary; we just store the URLs
+        if (isset($validated['images'])) {
+            $snake['images'] = $validated['images'];
         }
 
         $animal->update($snake);
 
         if ($animal->status === 'Auction') {
-            $existing = \App\Models\Auction::where('auctionable_type', \App\Models\Animal::class)
+            $existing = Auction::where('auctionable_type', Animal::class)
                 ->where('auctionable_id', $animal->id)
                 ->where('status', 'active')
                 ->first();
@@ -163,13 +138,13 @@ class AnimalController extends Controller
                 if ($request->has('auctionDurationHours') && $request->input('auctionDurationHours') !== null) {
                     $updateData['end_time'] = now()->addHours((int) $request->input('auctionDurationHours'));
                 }
-                if (!empty($updateData)) {
+                if (! empty($updateData)) {
                     $existing->update($updateData);
                 }
             } else {
-                \App\Models\Auction::create([
+                Auction::create([
                     'user_id' => $animal->user_id,
-                    'auctionable_type' => \App\Models\Animal::class,
+                    'auctionable_type' => Animal::class,
                     'auctionable_id' => $animal->id,
                     'starting_price' => $request->input('auctionStartingPrice', $animal->estimated_value ?? 0),
                     'status' => 'active',
@@ -177,7 +152,7 @@ class AnimalController extends Controller
                 ]);
             }
         } else {
-            \App\Models\Auction::where('auctionable_type', \App\Models\Animal::class)
+            Auction::where('auctionable_type', Animal::class)
                 ->where('auctionable_id', $animal->id)
                 ->where('status', 'active')
                 ->update(['status' => 'cancelled']);

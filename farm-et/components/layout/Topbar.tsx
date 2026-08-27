@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
+import { User, LogOut, ChevronDown, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Bell, Search, Plus, User, LogOut, ChevronDown, Menu } from "lucide-react";
 import { fetchUserProfile, logoutUser } from "@/lib/services";
 
 interface UserProfileData {

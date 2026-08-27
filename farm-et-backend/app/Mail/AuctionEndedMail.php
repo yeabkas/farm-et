@@ -14,6 +14,7 @@ class AuctionEndedMail extends Mailable
     use Queueable, SerializesModels;
 
     public $auction;
+
     public $role; // 'winner' or 'seller'
 
     public function __construct(Auction $auction, string $role)

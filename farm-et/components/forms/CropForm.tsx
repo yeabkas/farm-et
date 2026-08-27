@@ -43,7 +43,7 @@ const defaultFormState: CropFormState = {
   isPerennial: false,
 };
 
-export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
+export function CropForm({ initialData, onCancel, onSubmit, isSubmitting, uploadProgress }: CropFormProps) {
   const [formData, setFormData] = useState<CropFormState>(() => {
     if (initialData) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -52,8 +52,8 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
         ...rest,
         status: status ?? "Active",
         harvestUnits: harvestUnits ?? "kg",
-        auctionStartingPrice: (rest as any).auctionStartingPrice,
-        auctionDurationValue: (rest as any).auctionDurationHours,
+        auctionStartingPrice: (rest as Record<string, unknown>).auctionStartingPrice as number | undefined,
+        auctionDurationValue: (rest as Record<string, unknown>).auctionDurationHours as number | undefined,
         auctionDurationUnit: 'hours',
       };
     }

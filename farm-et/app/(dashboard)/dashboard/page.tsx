@@ -25,10 +25,10 @@ export default function OverviewDashboardPage() {
   
   // Handle various response structures (e.g. paginated vs raw array)
   const cropsArray = Array.isArray(cropsResponse?.data) ? cropsResponse.data : (Array.isArray(cropsResponse) ? cropsResponse : []);
-  const activeCropsCount = cropsArray.filter((c: any) => c.status !== 'Harvested' && c.status !== 'Completed').length;
+  const activeCropsCount = cropsArray.filter((c: { status: string }) => c.status !== 'Harvested' && c.status !== 'Completed').length;
 
   const animalsArray = Array.isArray(animalsResponse?.data) ? animalsResponse.data : (Array.isArray(animalsResponse) ? animalsResponse : []);
-  const activeAnimalsCount = animalsArray.filter((a: any) => a.status !== 'Sold' && a.status !== 'Deceased').length;
+  const activeAnimalsCount = animalsArray.filter((a: { status: string }) => a.status !== 'Sold' && a.status !== 'Deceased').length;
 
   if (isLoading) {
     return <div className="p-6 text-gray-500">Loading summary...</div>;

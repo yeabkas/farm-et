@@ -7,7 +7,7 @@ define('LARAVEL_START', microtime(true));
 // Vercel gives us a read-only filesystem. Only /tmp is writable!
 // So we must move all Laravel storage directories to /tmp during runtime.
 $storage = '/tmp/storage';
-if (!is_dir($storage)) {
+if (! is_dir($storage)) {
     mkdir($storage, 0755, true);
     mkdir($storage.'/app/public', 0755, true);
     mkdir($storage.'/framework/cache', 0755, true);

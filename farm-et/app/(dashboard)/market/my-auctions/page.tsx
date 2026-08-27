@@ -179,7 +179,7 @@ export default function MyAuctionsDashboard() {
             <div className="text-6xl">🔨</div>
             <p className="text-lg font-semibold text-gray-700">No auctions found</p>
             <p className="text-sm text-gray-500 max-w-xs mx-auto">
-              You haven't placed any items for auction yet, or none match your search.
+              You haven&apos;t placed any items for auction yet, or none match your search.
             </p>
           </div>
         )}

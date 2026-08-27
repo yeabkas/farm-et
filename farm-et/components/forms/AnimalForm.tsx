@@ -27,7 +27,7 @@ const defaultFormState = {
   estimatedValue: "",
 };
 
-export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps) {
+export function AnimalForm({ initialData, onCancel, onSubmit, isSubmitting, uploadProgress }: AnimalFormProps) {
   const [formData, setFormData] = useState<Omit<Animal, "id"> & { auctionDurationHours?: number, auctionStartingPrice?: number, auctionDurationValue?: number, auctionDurationUnit?: string }>(() => {
     if (initialData) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -46,8 +46,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
         veterinarian: rest.veterinarian ?? "",
         matureWeight: rest.matureWeight ?? "",
         estimatedValue: rest.estimatedValue ?? "",
-        auctionStartingPrice: (rest as any).auctionStartingPrice,
-        auctionDurationValue: (rest as any).auctionDurationHours,
+        auctionStartingPrice: (rest as Record<string, unknown>).auctionStartingPrice as number | undefined,
+        auctionDurationValue: (rest as Record<string, unknown>).auctionDurationHours as number | undefined,
         auctionDurationUnit: 'hours',
       };
     }

@@ -14,6 +14,7 @@ class NewBidNotificationMail extends Mailable
     use Queueable, SerializesModels;
 
     public $auction;
+
     public $newBidAmount;
 
     public function __construct(Auction $auction, $newBidAmount)
