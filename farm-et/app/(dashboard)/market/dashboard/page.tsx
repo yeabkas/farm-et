@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { fetchMarketListings, placeBid } from "@/lib/services";
-import { Search, SlidersHorizontal, Tag, MapPin, Package, X, ShoppingBag, Phone, Mail, Gavel } from "lucide-react";
+import { Search, SlidersHorizontal, Tag, MapPin, Package, X, ShoppingBag, Phone, Mail, Gavel, ChevronLeft, ChevronRight } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -218,21 +218,36 @@ function ContactModal({ listing, onClose, onBidSuccess }: { listing: Listing; on
 // ─── Product Card ─────────────────────────────────────────────────────────────
 
 function ProductCard({ listing, onContact }: { listing: Listing; onContact: () => void }) {
+  const [imageIndex, setImageIndex] = useState(0);
   const emoji = getEmoji(listing);
   const isAnimal = listing.listingType === "animal";
 
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (listing.images && listing.images.length > 0) {
+      setImageIndex((prev) => (prev + 1) % listing.images!.length);
+    }
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (listing.images && listing.images.length > 0) {
+      setImageIndex((prev) => (prev - 1 + listing.images!.length) % listing.images!.length);
+    }
+  };
+
   return (
-    <div className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+    <div className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col relative">
       {/* Image / Icon area */}
       <div className={`relative h-44 flex items-center justify-center text-7xl bg-cover bg-center
         ${!listing.images?.length ? (isAnimal
           ? "bg-gradient-to-br from-amber-50 to-orange-100"
-          : "bg-gradient-to-br from-emerald-50 to-green-100") : ""
+          : "bg-gradient-to-br from-emerald-50 to-green-100") : "bg-gray-100"
         }`}
-        style={listing.images?.length ? { backgroundImage: `url(${listing.images[0]})` } : {}}
+        style={listing.images?.length ? { backgroundImage: `url(${listing.images[imageIndex]})` } : {}}
       >
         {!listing.images?.length && <span className="select-none drop-shadow-md">{emoji}</span>}
-        <span className={`absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full shadow-sm
+        <span className={`absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full shadow-sm z-10
           ${isAnimal
             ? "bg-orange-100/90 backdrop-blur-sm text-orange-700 border border-orange-200"
             : "bg-emerald-100/90 backdrop-blur-sm text-emerald-700 border border-emerald-200"
@@ -240,9 +255,35 @@ function ProductCard({ listing, onContact }: { listing: Listing; onContact: () =
           {isAnimal ? "🐾 Animal" : "🌿 Crop"}
         </span>
         {listing.listingType === "animal" && listing.age && (
-          <span className="absolute top-3 right-3 text-xs bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-gray-600 border border-gray-200">
+          <span className="absolute top-3 right-3 text-xs bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-gray-600 border border-gray-200 z-10">
             {listing.age} yrs
           </span>
+        )}
+
+        {/* Carousel controls */}
+        {listing.images && listing.images.length > 1 && (
+          <>
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full bg-black/30 hover:bg-black/50 text-white backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 z-20"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full bg-black/30 hover:bg-black/50 text-white backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 z-20"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+              {listing.images.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`w-1.5 h-1.5 rounded-full ${idx === imageIndex ? 'bg-white' : 'bg-white/50'}`}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
 

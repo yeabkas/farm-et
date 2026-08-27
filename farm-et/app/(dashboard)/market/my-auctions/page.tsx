@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { fetchMyAuctions } from "@/lib/services";
-import { Gavel, X, Phone, Mail, Package, Users, Search } from "lucide-react";
+import { Gavel, X, Phone, Mail, Package, Users, Search, ChevronLeft, ChevronRight } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -116,6 +116,109 @@ function BidsModal({ auction, onClose }: { auction: MyAuction; onClose: () => vo
   );
 }
 
+function AuctionCard({ auction, onClick }: { auction: MyAuction; onClick: () => void }) {
+  const [imageIndex, setImageIndex] = useState(0);
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (auction.auctionable.images && auction.auctionable.images.length > 0) {
+      setImageIndex((prev) => (prev + 1) % auction.auctionable.images!.length);
+    }
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (auction.auctionable.images && auction.auctionable.images.length > 0) {
+      setImageIndex((prev) => (prev - 1 + auction.auctionable.images!.length) % auction.auctionable.images!.length);
+    }
+  };
+
+  return (
+    <div className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
+      <div 
+        className={`p-5 border-b border-gray-100 flex items-start justify-between relative bg-cover bg-center min-h-[140px] ${auction.auctionable.images?.length ? '' : 'bg-gray-50'}`}
+        style={auction.auctionable.images?.length ? { backgroundImage: `url(${auction.auctionable.images[imageIndex]})` } : {}}
+      >
+        {auction.auctionable.images?.length ? <div className="absolute inset-0 bg-white/70 backdrop-blur-sm" /> : null}
+        
+        {/* Carousel controls */}
+        {auction.auctionable.images && auction.auctionable.images.length > 1 && (
+          <>
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full bg-black/30 hover:bg-black/50 text-white backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 z-20"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full bg-black/30 hover:bg-black/50 text-white backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 z-20"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+              {auction.auctionable.images.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`w-1.5 h-1.5 rounded-full ${idx === imageIndex ? 'bg-black/80' : 'bg-black/30'}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        <div className="relative z-10">
+          <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1 block">
+            {auction.auctionable_type}
+          </span>
+          <h3 className="font-bold text-lg text-gray-900">{auction.auctionable.name}</h3>
+          <p className="text-sm text-gray-700">{auction.auctionable.category}</p>
+        </div>
+        <span className={`relative z-10 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
+          auction.status === 'active' && new Date(auction.end_time) > new Date()
+            ? 'bg-emerald-100/90 text-emerald-700 backdrop-blur-sm'
+            : 'bg-gray-100/90 text-gray-600 backdrop-blur-sm'
+        }`}>
+          {auction.status === 'active' && new Date(auction.end_time) > new Date() ? 'Active' : 'Ended'}
+        </span>
+      </div>
+      
+      <div className="p-5 flex-1 space-y-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-xs text-gray-500 uppercase font-semibold">Starting Price</p>
+            <p className="font-bold text-gray-900">{formatPrice(auction.starting_price)}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-amber-600 uppercase font-bold tracking-wider">Current Highest</p>
+            <p className="font-extrabold text-amber-600 text-lg">{formatPrice(auction.current_bid)}</p>
+          </div>
+        </div>
+        
+        <div className="bg-gray-50 rounded-xl p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-gray-400" />
+            <span className="text-sm font-medium text-gray-700">{auction.bid_count} Bids</span>
+          </div>
+          <span className="text-xs text-gray-500">
+            Ends: {formatDate(auction.end_time)}
+          </span>
+        </div>
+      </div>
+
+      <div className="p-4 pt-0">
+        <button
+          onClick={onClick}
+          className="w-full py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
+        >
+          <Package className="w-4 h-4" />
+          View Bidders
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function MyAuctionsDashboard() {
@@ -187,62 +290,14 @@ export default function MyAuctionsDashboard() {
 
         {!loading && !error && displayed.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayed.map((auction) => (
-              <div key={auction.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
-                <div 
-                  className={`p-5 border-b border-gray-100 flex items-start justify-between relative bg-cover bg-center ${auction.auctionable.images?.length ? '' : 'bg-gray-50'}`}
-                  style={auction.auctionable.images?.length ? { backgroundImage: `url(${auction.auctionable.images[0]})` } : {}}
-                >
-                  {auction.auctionable.images?.length ? <div className="absolute inset-0 bg-white/70 backdrop-blur-sm" /> : null}
-                  <div className="relative z-10">
-                    <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1 block">
-                      {auction.auctionable_type}
-                    </span>
-                    <h3 className="font-bold text-lg text-gray-900">{auction.auctionable.name}</h3>
-                    <p className="text-sm text-gray-700">{auction.auctionable.category}</p>
-                  </div>
-                  <span className={`relative z-10 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
-                    auction.status === 'active' && new Date(auction.end_time) > new Date()
-                      ? 'bg-emerald-100/90 text-emerald-700 backdrop-blur-sm'
-                      : 'bg-gray-100/90 text-gray-600 backdrop-blur-sm'
-                  }`}>
-                    {auction.status === 'active' && new Date(auction.end_time) > new Date() ? 'Active' : 'Ended'}
-                  </span>
-                </div>
-                
-                <div className="p-5 flex-1 space-y-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase font-semibold">Starting Price</p>
-                      <p className="font-bold text-gray-900">{formatPrice(auction.starting_price)}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-amber-600 uppercase font-bold tracking-wider">Current Highest</p>
-                      <p className="font-extrabold text-amber-600 text-lg">{formatPrice(auction.current_bid)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-gray-50 rounded-xl p-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-5 h-5 text-gray-400" />
-                      <span className="text-sm font-medium text-gray-700">{auction.bid_count} Bids</span>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      Ends: {formatDate(auction.end_time)}
-                    </span>
-                  </div>
-                </div>
 
-                <div className="p-4 pt-0">
-                  <button
-                    onClick={() => setSelectedAuction(auction)}
-                    className="w-full py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Package className="w-4 h-4" />
-                    View Bidders
-                  </button>
-                </div>
-              </div>
+
+            {displayed.map((auction) => (
+              <AuctionCard 
+                key={auction.id} 
+                auction={auction} 
+                onClick={() => setSelectedAuction(auction)} 
+              />
             ))}
           </div>
         )}
