@@ -28,6 +28,7 @@ interface Listing {
   sellerPhone?: string | null;
   farmName: string;
   createdAt: string;
+  images?: string[];
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -223,21 +224,23 @@ function ProductCard({ listing, onContact }: { listing: Listing; onContact: () =
   return (
     <div className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
       {/* Image / Icon area */}
-      <div className={`relative h-44 flex items-center justify-center text-7xl
-        ${isAnimal
+      <div className={`relative h-44 flex items-center justify-center text-7xl bg-cover bg-center
+        ${!listing.images?.length ? (isAnimal
           ? "bg-gradient-to-br from-amber-50 to-orange-100"
-          : "bg-gradient-to-br from-emerald-50 to-green-100"
-        }`}>
-        <span className="select-none drop-shadow-md">{emoji}</span>
-        <span className={`absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full
+          : "bg-gradient-to-br from-emerald-50 to-green-100") : ""
+        }`}
+        style={listing.images?.length ? { backgroundImage: `url(${listing.images[0]})` } : {}}
+      >
+        {!listing.images?.length && <span className="select-none drop-shadow-md">{emoji}</span>}
+        <span className={`absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full shadow-sm
           ${isAnimal
-            ? "bg-orange-100 text-orange-700 border border-orange-200"
-            : "bg-emerald-100 text-emerald-700 border border-emerald-200"
+            ? "bg-orange-100/90 backdrop-blur-sm text-orange-700 border border-orange-200"
+            : "bg-emerald-100/90 backdrop-blur-sm text-emerald-700 border border-emerald-200"
           }`}>
           {isAnimal ? "🐾 Animal" : "🌿 Crop"}
         </span>
         {listing.listingType === "animal" && listing.age && (
-          <span className="absolute top-3 right-3 text-xs bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full text-gray-600 border border-gray-200">
+          <span className="absolute top-3 right-3 text-xs bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-gray-600 border border-gray-200">
             {listing.age} yrs
           </span>
         )}

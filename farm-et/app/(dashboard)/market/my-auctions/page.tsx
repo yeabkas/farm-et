@@ -26,6 +26,7 @@ interface MyAuction {
   auctionable: {
     name: string;
     category: string;
+    images?: string[];
   };
   starting_price: number;
   current_bid: number;
@@ -188,18 +189,22 @@ export default function MyAuctionsDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayed.map((auction) => (
               <div key={auction.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
-                <div className="p-5 border-b border-gray-100 flex items-start justify-between">
-                  <div>
+                <div 
+                  className={`p-5 border-b border-gray-100 flex items-start justify-between relative bg-cover bg-center ${auction.auctionable.images?.length ? '' : 'bg-gray-50'}`}
+                  style={auction.auctionable.images?.length ? { backgroundImage: `url(${auction.auctionable.images[0]})` } : {}}
+                >
+                  {auction.auctionable.images?.length ? <div className="absolute inset-0 bg-white/70 backdrop-blur-sm" /> : null}
+                  <div className="relative z-10">
                     <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1 block">
                       {auction.auctionable_type}
                     </span>
                     <h3 className="font-bold text-lg text-gray-900">{auction.auctionable.name}</h3>
-                    <p className="text-sm text-gray-500">{auction.auctionable.category}</p>
+                    <p className="text-sm text-gray-700">{auction.auctionable.category}</p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  <span className={`relative z-10 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
                     auction.status === 'active' && new Date(auction.end_time) > new Date()
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-gray-100 text-gray-600'
+                      ? 'bg-emerald-100/90 text-emerald-700 backdrop-blur-sm'
+                      : 'bg-gray-100/90 text-gray-600 backdrop-blur-sm'
                   }`}>
                     {auction.status === 'active' && new Date(auction.end_time) > new Date() ? 'Active' : 'Ended'}
                   </span>
