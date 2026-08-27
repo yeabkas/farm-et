@@ -86,11 +86,11 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'host' => 'ep-super-bar-ayv8dy4l.c-5.us-east-2.aws.neon.tech',
+            'host' => 'ep-super-bar-ayv8dy4l-pooler.c-5.us-east-2.aws.neon.tech',
             'port' => '5432',
             'database' => 'neondb',
             'username' => 'neondb_owner',
-            'password' => 'endpoint=ep-super-bar-ayv8dy4l;npg_uXDte4NZQ7Br',
+            'password' => 'npg_uXDte4NZQ7Br',
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
