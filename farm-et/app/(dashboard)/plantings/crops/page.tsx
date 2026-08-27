@@ -12,8 +12,18 @@ import { CheckCircle, AlertCircle, X } from "lucide-react";
 
 function SellModal({ crop, onClose, onConfirm }: { crop: Crop, onClose: () => void, onConfirm: (type: 'sale' | 'auction', durationHours?: number, price?: number) => void }) {
   const [type, setType] = useState<'sale' | 'auction'>('sale');
-  const [duration, setDuration] = useState<number>(24);
+  const [durationValue, setDurationValue] = useState<number>(24);
+  const [durationUnit, setDurationUnit] = useState<'hours' | 'days' | 'months' | 'years'>('hours');
   const [price, setPrice] = useState<number>(Number(crop.estimatedValue) || 0);
+
+  const handleConfirm = () => {
+    let multiplier = 1;
+    if (durationUnit === 'days') multiplier = 24;
+    else if (durationUnit === 'months') multiplier = 24 * 30;
+    else if (durationUnit === 'years') multiplier = 24 * 365;
+    
+    onConfirm(type, durationValue * multiplier, price);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -36,15 +46,23 @@ function SellModal({ crop, onClose, onConfirm }: { crop: Crop, onClose: () => vo
 
           {type === 'auction' && (
             <div>
-              <label className="block text-sm font-medium mb-1">Auction Duration (Hours)</label>
-              <input type="number" min="1" value={duration} onChange={(e) => setDuration(Number(e.target.value))} className="w-full border rounded-md p-2 outline-none focus:border-emerald-500" />
+              <label className="block text-sm font-medium mb-1">Auction Duration</label>
+              <div className="flex gap-2">
+                <input type="number" min="1" value={durationValue} onChange={(e) => setDurationValue(Number(e.target.value))} className="w-full border rounded-md p-2 outline-none focus:border-emerald-500" />
+                <select value={durationUnit} onChange={(e) => setDurationUnit(e.target.value as 'hours' | 'days' | 'months' | 'years')} className="border rounded-md p-2 outline-none focus:border-emerald-500 w-1/2">
+                  <option value="hours">Hours</option>
+                  <option value="days">Days</option>
+                  <option value="months">Months</option>
+                  <option value="years">Years</option>
+                </select>
+              </div>
             </div>
           )}
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
           <button onClick={onClose} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">Cancel</button>
-          <button onClick={() => onConfirm(type, duration, price)} className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700">List Item</button>
+          <button onClick={handleConfirm} className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700">List Item</button>
         </div>
       </div>
     </div>
