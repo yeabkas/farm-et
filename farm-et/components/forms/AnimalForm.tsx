@@ -58,7 +58,7 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setSelectedFiles(Array.from(e.target.files));
+      setSelectedFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
     }
   };
 

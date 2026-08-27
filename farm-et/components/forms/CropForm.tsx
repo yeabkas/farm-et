@@ -64,7 +64,7 @@ export function CropForm({ initialData, onCancel, onSubmit }: CropFormProps) {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setSelectedFiles(Array.from(e.target.files));
+      setSelectedFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
     }
   };
 
