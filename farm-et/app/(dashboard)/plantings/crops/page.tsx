@@ -107,14 +107,35 @@ export default function CropsPage() {
     setShowForm(true);
   };
 
-  const handleSubmitForm = async (submittedCrop: Crop) => {
+  const handleSubmitForm = async (submittedCrop: Crop, files?: File[]) => {
     try {
+      const formData = new FormData();
+      
+      // Append all crop fields
+      Object.entries(submittedCrop).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, String(value));
+        }
+      });
+
+      // Append selected image files
+      if (files && files.length > 0) {
+        files.forEach((file) => {
+          formData.append('images[]', file);
+        });
+      }
+
+      const config = {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      };
+
       if (editingCrop) {
-        const res = await api.put(`/crops/${editingCrop.id}`, submittedCrop);
+        formData.append('_method', 'PUT'); // Laravel requirement for multipart PUT
+        const res = await api.post(`/crops/${editingCrop.id}`, formData, config);
         const updated: Crop = res.data?.data ?? res.data;
         setCrops((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
       } else {
-        const res = await api.post("/crops", submittedCrop);
+        const res = await api.post("/crops", formData, config);
         const created: Crop = res.data?.data ?? res.data;
         setCrops((prev) => [...prev, created]);
       }

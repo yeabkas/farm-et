@@ -107,14 +107,35 @@ export default function AnimalsPage() {
     setShowForm(true);
   };
 
-  const handleSubmitForm = async (submittedAnimal: Animal) => {
+  const handleSubmitForm = async (submittedAnimal: Animal, files?: File[]) => {
     try {
+      const formData = new FormData();
+      
+      // Append all animal fields
+      Object.entries(submittedAnimal).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, String(value));
+        }
+      });
+
+      // Append selected image files
+      if (files && files.length > 0) {
+        files.forEach((file) => {
+          formData.append('images[]', file);
+        });
+      }
+
+      const config = {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      };
+
       if (editingAnimal) {
-        const res = await api.put(`/animals/${editingAnimal.id}`, submittedAnimal);
+        formData.append('_method', 'PUT'); // Laravel requirement for multipart PUT
+        const res = await api.post(`/animals/${editingAnimal.id}`, formData, config);
         const updated: Animal = res.data?.data ?? res.data;
         setAnimals((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
       } else {
-        const res = await api.post("/animals", submittedAnimal);
+        const res = await api.post("/animals", formData, config);
         const created: Animal = res.data?.data ?? res.data;
         setAnimals((prev) => [...prev, created]);
       }

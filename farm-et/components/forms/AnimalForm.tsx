@@ -6,7 +6,7 @@ import { Animal } from "@/types/animal";
 interface AnimalFormProps {
   initialData?: Animal | null;
   onCancel: () => void;
-  onSubmit: (animal: Animal) => void;
+  onSubmit: (animal: Animal, files?: File[]) => void;
 }
 
 const defaultFormState = {
@@ -52,7 +52,15 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
     return defaultFormState;
   });
 
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
   const isEditing = Boolean(initialData);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setSelectedFiles(Array.from(e.target.files));
+    }
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -79,13 +87,14 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name) return;
-    onSubmit(createAnimalObject());
+    onSubmit(createAnimalObject(), selectedFiles);
   };
 
   const handleSaveAndNew = () => {
     if (!formData.name) return;
-    onSubmit(createAnimalObject());
+    onSubmit(createAnimalObject(), selectedFiles);
     setFormData(defaultFormState);
+    setSelectedFiles([]);
   };
 
   return (
@@ -347,6 +356,36 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
                   onChange={handleInputChange}
                   className="w-full p-2 text-sm outline-none"
                 />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Images Upload */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-mono text-gray-700 border-b pb-2">Images</h3>
+          <div className="max-w-4xl">
+            <div className="flex flex-col sm:flex-row items-start gap-1.5 sm:gap-0">
+              <label className="w-full sm:w-40 text-sm font-mono text-gray-700 pt-2">Upload Images</label>
+              <div className="flex-1 w-full">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
+                />
+                
+                {selectedFiles.length > 0 && (
+                  <div className="mt-4 flex gap-4 flex-wrap">
+                    {selectedFiles.map((file, idx) => (
+                      <div key={idx} className="relative w-24 h-24 border border-gray-200 rounded-md overflow-hidden bg-gray-50">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
