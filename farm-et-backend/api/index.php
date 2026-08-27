@@ -29,29 +29,10 @@ putenv("APP_SERVICES_CACHE={$storage}/bootstrap/cache/services.php");
 
 require __DIR__.'/../vendor/autoload.php';
 
-// Force debug mode for troubleshooting
-$_ENV['APP_DEBUG'] = 'true';
-putenv('APP_DEBUG=true');
-
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
 // Tell Laravel to use /tmp for all storage paths
 $app->useStoragePath($storage);
-
-// ─── Raw DB debug (bypass Laravel entirely) ─────────────────────────────────
-if (isset($_GET['rawdb'])) {
-    header('Content-Type: application/json');
-    try {
-        $dsn = 'pgsql:host=ep-super-bar-ayv8dy4l-pooler.c-5.us-east-2.aws.neon.tech;port=5432;dbname=neondb;sslmode=require';
-        $pdo = new PDO($dsn, 'neondb_owner', 'npg_uXDte4NZQ7Br');
-        $stmt = $pdo->query('SELECT version()');
-        echo json_encode(['ok' => true, 'version' => $stmt->fetchColumn(), 'dsn' => $dsn]);
-    } catch (\Exception $e) {
-        echo json_encode(['ok' => false, 'error' => $e->getMessage(), 'code' => $e->getCode()]);
-    }
-    exit;
-}
-// ─────────────────────────────────────────────────────────────────────────────
 
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 $app->handleRequest(Request::capture());
