@@ -23,6 +23,7 @@ class CropResource extends JsonResource
             'harvestUnits' => $this->harvest_units,
             'saleWindow' => $this->sale_window,
             'estimatedValue' => $this->estimated_value,
+            'images' => $this->images ?? [],
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
         ];

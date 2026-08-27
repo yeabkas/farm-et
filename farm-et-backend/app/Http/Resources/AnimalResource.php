@@ -9,7 +9,7 @@ class AnimalResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'userId' => $this->user_id,
             'name' => $this->name,
@@ -25,6 +25,7 @@ class AnimalResource extends JsonResource
             'veterinarian' => $this->veterinarian,
             'matureWeight' => $this->mature_weight,
             'estimatedValue' => $this->estimated_value,
+            'images' => $this->images ?? [],
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
         ];
