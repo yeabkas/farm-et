@@ -7,6 +7,8 @@ interface AnimalFormProps {
   initialData?: Animal | null;
   onCancel: () => void;
   onSubmit: (animal: Animal, files?: File[]) => void;
+  isSubmitting?: boolean;
+  uploadProgress?: number;
 }
 
 const defaultFormState = {
@@ -409,7 +411,8 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-mono text-gray-600 hover:bg-gray-100 rounded-md transition w-full sm:w-auto text-center"
+              disabled={isSubmitting}
+              className="px-4 py-2 text-sm font-mono text-gray-600 hover:bg-gray-100 rounded-md transition w-full sm:w-auto text-center disabled:opacity-50"
             >
               Cancel
             </button>
@@ -417,19 +420,46 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
               <button
                 type="button"
                 onClick={handleSaveAndNew}
-                className="px-4 py-2 text-sm font-mono border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md transition w-full sm:w-auto text-center"
+                disabled={isSubmitting}
+                className="px-4 py-2 text-sm font-mono border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md transition w-full sm:w-auto text-center disabled:opacity-50"
               >
                 Save & New
               </button>
             )}
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-mono bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition shadow-xs w-full sm:w-auto text-center"
+              disabled={isSubmitting}
+              className="px-5 py-2 text-sm font-mono bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition shadow-xs w-full sm:w-auto text-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isEditing ? "Save Changes" : "Create"}
+              {isSubmitting ? "Saving..." : isEditing ? "Save Changes" : "Create"}
             </button>
           </div>
         </div>
+
+        {/* Upload Progress Overlay */}
+        {isSubmitting && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-200 border-t-emerald-600 mx-auto mb-4"></div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                {(uploadProgress ?? 0) < 100 ? "Uploading Images..." : "Saving..."}
+              </h3>
+              {(uploadProgress ?? 0) > 0 && (uploadProgress ?? 0) < 100 && (
+                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                  <div
+                    className="bg-emerald-600 h-2.5 rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              )}
+              <p className="text-sm text-gray-500">
+                {(uploadProgress ?? 0) < 100
+                  ? `Uploading... ${uploadProgress ?? 0}%`
+                  : "Saving to database..."}
+              </p>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );

@@ -216,6 +216,8 @@ export default function CropsPage() {
           initialData={editingCrop}
           onCancel={handleCancel}
           onSubmit={handleSubmitForm}
+          isSubmitting={isSubmitting}
+          uploadProgress={uploadProgress}
         />
       ) : loading ? (
         <div className="flex items-center justify-center py-20">
