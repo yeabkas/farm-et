@@ -376,12 +376,21 @@ export function AnimalForm({ initialData, onCancel, onSubmit }: AnimalFormProps)
                   className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
                 />
                 
-                {selectedFiles.length > 0 && (
+                {(selectedFiles.length > 0 || (initialData?.images && initialData.images.length > 0)) && (
                   <div className="mt-4 flex gap-4 flex-wrap">
-                    {selectedFiles.map((file, idx) => (
-                      <div key={idx} className="relative w-24 h-24 border border-gray-200 rounded-md overflow-hidden bg-gray-50">
+                    {/* Existing Images */}
+                    {initialData?.images?.map((url: string, idx: number) => (
+                      <div key={`existing-${idx}`} className="relative w-24 h-24 border border-gray-200 rounded-md overflow-hidden bg-gray-50">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover" />
+                        <img src={url} alt="saved preview" className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                    
+                    {/* New Selected Files */}
+                    {selectedFiles.map((file, idx) => (
+                      <div key={`new-${idx}`} className="relative w-24 h-24 border border-emerald-200 rounded-md overflow-hidden bg-gray-50 shadow-sm">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={URL.createObjectURL(file)} alt="new preview" className="w-full h-full object-cover opacity-80" />
                       </div>
                     ))}
                   </div>
