@@ -107,35 +107,31 @@ export default function CropsPage() {
     setShowForm(true);
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
   const handleSubmitForm = async (submittedCrop: Crop, files?: File[]) => {
     try {
-      const formData = new FormData();
-      
-      // Append all crop fields
-      Object.entries(submittedCrop).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, String(value));
-        }
-      });
+      setIsSubmitting(true);
+      setUploadProgress(0);
 
-      // Append selected image files
+      // Upload images directly to Cloudinary from the browser
+      let imageUrls: string[] = submittedCrop.images ?? [];
       if (files && files.length > 0) {
-        files.forEach((file) => {
-          formData.append('images[]', file);
-        });
+        const { uploadToCloudinary } = await import("@/lib/cloudinary");
+        const newUrls = await uploadToCloudinary(files, (pct) => setUploadProgress(pct));
+        imageUrls = [...imageUrls, ...newUrls];
       }
 
-      const config = {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      };
+      // Send crop data + image URLs as plain JSON to the backend
+      const payload = { ...submittedCrop, images: imageUrls };
 
       if (editingCrop) {
-        formData.append('_method', 'PUT'); // Laravel requirement for multipart PUT
-        const res = await api.post(`/crops/${editingCrop.id}`, formData, config);
+        const res = await api.put(`/crops/${editingCrop.id}`, payload);
         const updated: Crop = res.data?.data ?? res.data;
         setCrops((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
       } else {
-        const res = await api.post("/crops", formData, config);
+        const res = await api.post("/crops", payload);
         const created: Crop = res.data?.data ?? res.data;
         setCrops((prev) => [...prev, created]);
       }
@@ -145,6 +141,9 @@ export default function CropsPage() {
       const err = error as { response?: { data?: { message?: string } } };
       console.error("Failed to save crop:", err?.response?.data ?? err);
       alert("Failed to save crop: " + (err?.response?.data?.message ?? "Please try again."));
+    } finally {
+      setIsSubmitting(false);
+      setUploadProgress(0);
     }
   };
 

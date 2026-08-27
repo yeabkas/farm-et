@@ -107,35 +107,31 @@ export default function AnimalsPage() {
     setShowForm(true);
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
   const handleSubmitForm = async (submittedAnimal: Animal, files?: File[]) => {
     try {
-      const formData = new FormData();
-      
-      // Append all animal fields
-      Object.entries(submittedAnimal).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, String(value));
-        }
-      });
+      setIsSubmitting(true);
+      setUploadProgress(0);
 
-      // Append selected image files
+      // Upload images directly to Cloudinary from the browser
+      let imageUrls: string[] = submittedAnimal.images ?? [];
       if (files && files.length > 0) {
-        files.forEach((file) => {
-          formData.append('images[]', file);
-        });
+        const { uploadToCloudinary } = await import("@/lib/cloudinary");
+        const newUrls = await uploadToCloudinary(files, (pct) => setUploadProgress(pct));
+        imageUrls = [...imageUrls, ...newUrls];
       }
 
-      const config = {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      };
+      // Send animal data + image URLs as plain JSON to the backend
+      const payload = { ...submittedAnimal, images: imageUrls };
 
       if (editingAnimal) {
-        formData.append('_method', 'PUT'); // Laravel requirement for multipart PUT
-        const res = await api.post(`/animals/${editingAnimal.id}`, formData, config);
+        const res = await api.put(`/animals/${editingAnimal.id}`, payload);
         const updated: Animal = res.data?.data ?? res.data;
         setAnimals((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
       } else {
-        const res = await api.post("/animals", formData, config);
+        const res = await api.post("/animals", payload);
         const created: Animal = res.data?.data ?? res.data;
         setAnimals((prev) => [...prev, created]);
       }
@@ -145,6 +141,9 @@ export default function AnimalsPage() {
       const err = error as { response?: { data?: { message?: string } } };
       console.error("Failed to save animal:", err?.response?.data ?? err);
       alert("Failed to save animal: " + (err?.response?.data?.message ?? "Please try again."));
+    } finally {
+      setIsSubmitting(false);
+      setUploadProgress(0);
     }
   };
 
