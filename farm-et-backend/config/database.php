@@ -90,7 +90,7 @@ return [
             'port' => '5432',
             'database' => 'neondb',
             'username' => 'neondb_owner',
-            'password' => 'npg_uXDte4NZQ7Br',
+            'password' => 'endpoint=ep-super-bar-ayv8dy4l-pooler$npg_uXDte4NZQ7Br',
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
