@@ -51,7 +51,7 @@ class QStashWebhookController extends Controller
                 if ($auction->bids()->count() > 0) {
                     $auction->auctionable->update(['status' => 'Sold']);
                 } else {
-                    $auction->auctionable->update(['status' => 'Available']); // Revert to available if no bids
+                    $auction->auctionable->update(['status' => 'Active']); // Revert to active if no bids
                 }
             }
 
