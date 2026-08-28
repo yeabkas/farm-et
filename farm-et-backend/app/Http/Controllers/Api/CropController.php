@@ -156,6 +156,7 @@ class CropController extends Controller
             Auction::where('auctionable_type', Crop::class)
                 ->where('auctionable_id', $crop->id)
                 ->where('status', 'active')
+                ->update(['status' => 'cancelled']);
         }
 
         \Illuminate\Support\Facades\Cache::forget('market.listings');
