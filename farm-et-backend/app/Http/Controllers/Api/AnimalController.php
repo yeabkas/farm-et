@@ -173,6 +173,8 @@ class AnimalController extends Controller
 
         $animal->delete();
 
+        Cache::forget('market.listings');
+
         return response()->json(['message' => 'Animal deleted successfully']);
     }
 }

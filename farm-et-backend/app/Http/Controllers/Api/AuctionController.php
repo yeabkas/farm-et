@@ -115,6 +115,32 @@ class AuctionController extends Controller
             'end_time' => now()->addHours($duration),
         ]);
 
+        try {
+            $qstashToken = env('QSTASH_TOKEN');
+            if ($qstashToken) {
+                // Schedule the webhook in QStash to fire exactly when the auction expires
+                $delay = $duration . 'h';
+                // Note: env('APP_URL') should be the publicly accessible URL of the backend (e.g. your Vercel URL)
+                $webhookUrl = env('APP_URL') . '/api/qstash/webhook';
+                
+                \Illuminate\Support\Facades\Http::withToken($qstashToken)
+                    ->withHeaders([
+                        'Upstash-Delay' => $delay,
+                        'Content-Type' => 'application/json'
+                    ])
+                    ->post('https://qstash.upstash.io/v2/publish/' . $webhookUrl, [
+                        'job_type' => 'close_auction',
+                        'auction_id' => $auction->id
+                    ]);
+                    
+                \Illuminate\Support\Facades\Log::info("Scheduled auction $auction->id to close in $delay via QStash");
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Failed to schedule QStash job for auction $auction->id: " . $e->getMessage());
+        }
+
+        \Illuminate\Support\Facades\Cache::forget('market.listings');
+
         return response()->json(['message' => 'Auction created successfully', 'auction' => $auction], 201);
     }
 

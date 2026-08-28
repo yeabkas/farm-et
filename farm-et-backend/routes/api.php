@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\BidController;
 use App\Http\Controllers\Api\CropController;
 use App\Http\Controllers\Api\MarketController;
 use App\Http\Controllers\Api\OnboardingController;
+use App\Http\Controllers\Api\QStashWebhookController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Models\User;
@@ -21,6 +22,9 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Market listings are public — no login required to browse
 Route::get('/market/listings', [MarketController::class, 'listings']);
+
+// QStash Webhook (Serverless background job processing)
+Route::post('/qstash/webhook', [QStashWebhookController::class, 'handle']);
 
 // ─── Protected Routes (require Sanctum token) ─────────────────────────────────
 
