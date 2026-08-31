@@ -107,7 +107,27 @@ ${farmDataContext}`;
         const token = cookieStore.get('auth_token')?.value;
         if (token) {
           const farmData = await fetchFarmData(token);
-          entityWithImage = farmData.animals.find(a => a.images && a.images.length > 0) || 
+          const userText = latestUserMessage.content.toLowerCase();
+          
+          // Try to find a matching animal based on the text first
+          const matchedAnimal = farmData.animals.find(a => {
+            const hasImage = a.images && a.images.length > 0;
+            const name = String(a.name || '').toLowerCase();
+            const type = String(a.type || a.animalType || a.breed || '').toLowerCase();
+            return hasImage && (userText.includes(name) || userText.includes(type));
+          });
+          
+          // Try to find a matching crop based on the text
+          const matchedCrop = farmData.crops.find(c => {
+            const hasImage = c.images && c.images.length > 0;
+            const type = String(c.crop_type || c.cropType || c.name || '').toLowerCase();
+            const variety = String(c.variety_strain || c.varietyStrain || '').toLowerCase();
+            return hasImage && (userText.includes(type) || (variety && userText.includes(variety)));
+          });
+
+          // Fallback to the first one with an image if no specific match is found
+          entityWithImage = matchedAnimal || matchedCrop || 
+                            farmData.animals.find(a => a.images && a.images.length > 0) || 
                             farmData.crops.find(c => c.images && c.images.length > 0);
         }
       } catch (err) {
