@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ReportFilterBar } from "@/components/accounting/ReportFilterBar";
+import { fetchTransactions } from "@/lib/services";
 
 interface CashFlowItem {
   category: string;
   amount: number;
+}
+
+interface Transaction {
+  id: number;
+  type: 'Income' | 'Expense';
+  category: string;
+  amount: number;
+  date: string;
 }
 
 export default function CashFlowStatementPage() {
@@ -13,34 +22,83 @@ export default function CashFlowStatementPage() {
   const [endDate, setEndDate] = useState("2026-12-31");
   const [grouping, setGrouping] = useState("No Grouping");
 
-  // Balances
-  const beginningBalance = 0.0;
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Operating Cash Inflow
-  const operatingInflows: CashFlowItem[] = [
-    {
-      category:
-        "Sales of livestock, produce, grains, and other products you raised",
-      amount: 100.0,
-    },
-  ];
+  const loadData = () => {
+    setLoading(true);
+    fetchTransactions()
+      .then((res: any) => {
+        setTransactions(res.data || []);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  };
 
-  // Cash Expenditures
-  const cashExpenditures: CashFlowItem[] = [
-    { category: "Depreciation", amount: -11.0 },
-  ];
-
-  const totalInflow = operatingInflows.reduce((acc, i) => acc + i.amount, 0);
-  const totalExpenditures = cashExpenditures.reduce(
-    (acc, i) => acc + i.amount,
-    0
-  );
-  const netChangeInCash = totalInflow + totalExpenditures;
-  const endingCashBalance = beginningBalance + netChangeInCash;
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const handleUpdate = () => {
-    // Refetch or recalculate logic
+    loadData();
   };
+
+  const { operatingInflows, cashExpenditures, totalInflow, totalExpenditures, netChangeInCash, endingCashBalance } = useMemo(() => {
+    const start = new Date(startDate).getTime();
+    const end = new Date(endDate).getTime();
+
+    // Calculate beginning balance from transactions before startDate
+    let beginningBalance = 0.0;
+    transactions.forEach(t => {
+      if (!t.date) return;
+      const tTime = new Date(t.date).getTime();
+      if (tTime < start) {
+        const amt = Number(t.amount) || 0;
+        if (t.type === 'Income') beginningBalance += amt;
+        else if (t.type === 'Expense') beginningBalance -= amt;
+      }
+    });
+
+    const filtered = transactions.filter(t => {
+      if (!t.date) return false;
+      const tTime = new Date(t.date).getTime();
+      return tTime >= start && tTime <= end;
+    });
+
+    const inflowMap: Record<string, number> = {};
+    const expenditureMap: Record<string, number> = {};
+
+    filtered.forEach(t => {
+      const amt = Number(t.amount) || 0;
+      if (t.type === 'Income') {
+        inflowMap[t.category] = (inflowMap[t.category] || 0) + amt;
+      } else if (t.type === 'Expense') {
+        expenditureMap[t.category] = (expenditureMap[t.category] || 0) + amt;
+      }
+    });
+
+    const inflowArr: CashFlowItem[] = Object.keys(inflowMap).map(k => ({ category: k, amount: inflowMap[k] }));
+    const expenditureArr: CashFlowItem[] = Object.keys(expenditureMap).map(k => ({ category: k, amount: -expenditureMap[k] })); // Negative for expenditures
+
+    const tInflow = inflowArr.reduce((acc, i) => acc + i.amount, 0);
+    const tExpenditures = expenditureArr.reduce((acc, i) => acc + i.amount, 0);
+
+    const netChange = tInflow + tExpenditures;
+    const endingBalance = beginningBalance + netChange;
+
+    return {
+      beginningBalance,
+      operatingInflows: inflowArr,
+      cashExpenditures: expenditureArr,
+      totalInflow: tInflow,
+      totalExpenditures: tExpenditures,
+      netChangeInCash: netChange,
+      endingCashBalance: endingBalance
+    };
+  }, [transactions, startDate, endDate]);
+
+  // Using the calculated beginning balance instead of a hardcoded one
+  const beginningBalance = endingCashBalance - netChangeInCash;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-mono text-sm p-4">

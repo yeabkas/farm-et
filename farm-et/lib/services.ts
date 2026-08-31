@@ -114,6 +114,16 @@ export const createTransaction = async (data: {
   return response.data;
 };
 
+export const updateTransaction = async (id: string | number, data: any) => {
+  const response = await api.put(`/transactions/${id}`, data);
+  return response.data;
+};
+
+export const deleteTransaction = async (id: string | number) => {
+  const response = await api.delete(`/transactions/${id}`);
+  return response.data;
+};
+
 // ─── Financial Summary Report ─────────────────────────────────────────────────
 
 export const fetchFinancialSummary = async (year: number = new Date().getFullYear()) => {

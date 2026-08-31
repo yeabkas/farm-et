@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { fetchTransactions, createTransaction, updateTransaction, deleteTransaction } from "@/lib/services";
 import { Transaction } from "@/types/transaction";
 import { TransactionHeader } from "@/components/headers/TransactionHeader";
 import { TransactionFormModal } from "@/components/forms/TransactionFormModal";
@@ -11,6 +12,18 @@ export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+
+  useEffect(() => {
+    const loadTransactions = async () => {
+      try {
+        const response = await fetchTransactions();
+        setTransactions(response.data || response || []);
+      } catch (err) {
+        console.error("Failed to fetch transactions", err);
+      }
+    };
+    loadTransactions();
+  }, []);
 
   // Calculated totals for Revenue, Expenses, and Profit
   const { revenue, expenses, profit } = useMemo(() => {
@@ -46,22 +59,55 @@ export default function TransactionsPage() {
   };
 
   // Delete a transaction
-  const handleDeleteTransaction = (id: string | number) => {
-    setTransactions((prev) => prev.filter((t) => String(t.id) !== String(id)));
+  const handleDeleteTransaction = async (id: string | number) => {
+    try {
+      await deleteTransaction(id);
+      setTransactions((prev) => prev.filter((t) => String(t.id) !== String(id)));
+    } catch (err) {
+      console.error("Failed to delete transaction", err);
+    }
   };
 
   // Form submit handler (Handles BOTH Create and Update)
-  const handleSubmitForm = (submittedTx: Transaction) => {
-    if (editingTransaction) {
-      setTransactions((prev) =>
-        prev.map((item) => (item.id === submittedTx.id ? submittedTx : item))
-      );
-    } else {
-      setTransactions((prev) => [submittedTx, ...prev]);
-    }
+  const handleSubmitForm = async (submittedTx: Transaction) => {
+    try {
+      if (editingTransaction) {
+        const updated = await updateTransaction(submittedTx.id, {
+          type: submittedTx.type,
+          amount: submittedTx.amount,
+          payeeCustomer: submittedTx.payeeCustomer,
+          category: submittedTx.category,
+          date: submittedTx.date,
+          reportingYear: Number(submittedTx.reportingYear),
+          description: submittedTx.description,
+          checkNumber: submittedTx.checkNumber,
+          associatedTo: submittedTx.associatedTo,
+          keywords: submittedTx.keywords,
+        });
+        setTransactions((prev) =>
+          prev.map((item) => (item.id === submittedTx.id ? (updated.data || updated) : item))
+        );
+      } else {
+        const created = await createTransaction({
+          type: submittedTx.type,
+          amount: submittedTx.amount,
+          payeeCustomer: submittedTx.payeeCustomer,
+          category: submittedTx.category,
+          date: submittedTx.date,
+          reportingYear: Number(submittedTx.reportingYear),
+          description: submittedTx.description,
+          checkNumber: submittedTx.checkNumber,
+          associatedTo: submittedTx.associatedTo,
+          keywords: submittedTx.keywords,
+        });
+        setTransactions((prev) => [created.data || created, ...prev]);
+      }
 
-    setIsModalOpen(false);
-    setEditingTransaction(null);
+      setIsModalOpen(false);
+      setEditingTransaction(null);
+    } catch (err) {
+      console.error("Failed to save transaction", err);
+    }
   };
 
   // Close modal handler

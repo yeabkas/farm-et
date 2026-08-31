@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ReportFilterBar } from "@/components/accounting/ReportFilterBar";
+import { fetchTransactions } from "@/lib/services";
 
 interface ReportItem {
   category: string;
   amount: number;
+}
+
+interface Transaction {
+  id: number;
+  type: 'Income' | 'Expense';
+  category: string;
+  amount: number;
+  date: string;
 }
 
 export default function PnLStatementPage() {
@@ -13,26 +22,65 @@ export default function PnLStatementPage() {
   const [endDate, setEndDate] = useState("2026-12-31");
   const [grouping, setGrouping] = useState("No Grouping");
 
-  // Sample data matching screen design
-  const incomeItems: ReportItem[] = [
-    {
-      category:
-        "Sales of livestock, produce, grains, and other products you raised",
-      amount: 100.0,
-    },
-  ];
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const expenseItems: ReportItem[] = [
-    { category: "Depreciation", amount: 11.0 },
-  ];
+  const loadData = () => {
+    setLoading(true);
+    fetchTransactions()
+      .then((res: any) => {
+        setTransactions(res.data || []);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  };
 
-  const totalIncome = incomeItems.reduce((acc, item) => acc + item.amount, 0);
-  const totalExpenses = expenseItems.reduce((acc, item) => acc + item.amount, 0);
-  const netProfit = totalIncome - totalExpenses;
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const handleUpdate = () => {
-    // Logic to refetch or recalculate report data based on date ranges
+    // Re-filter happens automatically due to useMemo, but we can also re-fetch if needed
+    loadData();
   };
+
+  // Filter and group transactions
+  const { incomeItems, expenseItems, totalIncome, totalExpenses, netProfit } = useMemo(() => {
+    const start = new Date(startDate).getTime();
+    const end = new Date(endDate).getTime();
+
+    const filtered = transactions.filter(t => {
+      if (!t.date) return false;
+      const tTime = new Date(t.date).getTime();
+      return tTime >= start && tTime <= end;
+    });
+
+    const incomeMap: Record<string, number> = {};
+    const expenseMap: Record<string, number> = {};
+
+    filtered.forEach(t => {
+      const amt = Number(t.amount) || 0;
+      if (t.type === 'Income') {
+        incomeMap[t.category] = (incomeMap[t.category] || 0) + amt;
+      } else if (t.type === 'Expense') {
+        expenseMap[t.category] = (expenseMap[t.category] || 0) + amt;
+      }
+    });
+
+    const incomeArr: ReportItem[] = Object.keys(incomeMap).map(k => ({ category: k, amount: incomeMap[k] }));
+    const expenseArr: ReportItem[] = Object.keys(expenseMap).map(k => ({ category: k, amount: expenseMap[k] }));
+
+    const tIncome = incomeArr.reduce((acc, item) => acc + item.amount, 0);
+    const tExpenses = expenseArr.reduce((acc, item) => acc + item.amount, 0);
+
+    return {
+      incomeItems: incomeArr,
+      expenseItems: expenseArr,
+      totalIncome: tIncome,
+      totalExpenses: tExpenses,
+      netProfit: tIncome - tExpenses
+    };
+  }, [transactions, startDate, endDate]);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-mono text-sm p-4">

@@ -17,7 +17,7 @@ class MarketController extends Controller
      */
     public function listings(): JsonResponse
     {
-        $listings = \Illuminate\Support\Facades\Cache::remember('market.listings', 300, function () {
+        $listings = \Illuminate\Support\Facades\Cache::remember('market.listings.v3', 300, function () {
             // ─── Animals listed For Sale or Auction ───────────────────────────
             $animals = Animal::whereIn('status', ['For Sale', 'Auction'])
                 ->with(['user.farmProfile', 'auction.highestBid', 'auction.bids'])
@@ -34,7 +34,7 @@ class MarketController extends Controller
                         'auctionId' => $auction?->id,
                         'currentBid' => $highestBid ? $highestBid->amount : ($auction ? $auction->starting_price : null),
                         'bidCount' => $auction ? $auction->bids->count() : 0,
-                        'auctionEndTime' => $auction?->end_time,
+                        'auctionEndTime' => $auction?->end_time?->toISOString(),
                         'name' => $animal->name,
                         'category' => $animal->animal_type,
                         'breed' => $animal->breed,
@@ -71,7 +71,7 @@ class MarketController extends Controller
                         'auctionId' => $auction?->id,
                         'currentBid' => $highestBid ? $highestBid->amount : ($auction ? $auction->starting_price : null),
                         'bidCount' => $auction ? $auction->bids->count() : 0,
-                        'auctionEndTime' => $auction?->end_time,
+                        'auctionEndTime' => $auction?->end_time?->toISOString(),
                         'name' => $crop->crop_type,
                         'category' => $crop->variety_strain ?? $crop->crop_type,
                         'breed' => null,
@@ -95,12 +95,13 @@ class MarketController extends Controller
             // ─── Merge and sort by newest first ──────────────────────────────
             return $animals->concat($crops)
                 ->sortByDesc('createdAt')
-                ->values();
+                ->values()
+                ->all();
         });
 
         return response()->json([
             'data' => $listings,
-            'total' => $listings->count(),
+            'total' => count($listings),
         ]);
     }
 }
