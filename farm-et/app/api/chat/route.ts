@@ -93,7 +93,8 @@ ${farmDataContext}`;
 
   // ── Vision / Image Analysis Logic ──────────────────────────────────────
   if (latestUserMessage && typeof latestUserMessage.content === 'string') {
-    const wantsAnalysis = /analyze|look at|inspect|check/i.test(latestUserMessage.content);
+    // Catch typos like "analye", "analyse", "analyz" and visual terms
+    const wantsAnalysis = /analy|look|inspect|check|see|image|photo|picture|view/i.test(latestUserMessage.content);
     
     if (wantsAnalysis) {
       // Find the first animal or crop with an image for analysis

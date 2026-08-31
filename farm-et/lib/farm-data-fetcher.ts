@@ -123,30 +123,24 @@ export function farmDataToPromptContext(data: FarmDataSnapshot): string {
 
   // Livestock summary
   if (data.animals.length > 0) {
-    const byType: Record<string, number> = {};
+    sections.push(`\nLIVESTOCK (${data.animals.length} total):`);
     for (const a of data.animals) {
-      const type = a.type || a.breed || 'Unknown';
-      byType[type] = (byType[type] || 0) + 1;
+      const name = a.name || 'Unnamed';
+      const type = a.type || a.animalType || a.breed || 'Unknown Type';
+      sections.push(`  - ${name} (Type: ${type}, Status: ${a.status || 'Active'})`);
     }
-    sections.push(
-      `\nLIVESTOCK (${data.animals.length} total):`,
-      ...Object.entries(byType).map(([type, count]) => `  ${type}: ${count}`),
-    );
   } else {
     sections.push('\nLIVESTOCK: No animals registered yet.');
   }
 
   // Crops summary
   if (data.crops.length > 0) {
-    const byType: Record<string, number> = {};
+    sections.push(`\nCROPS (${data.crops.length} total):`);
     for (const c of data.crops) {
-      const type = c.crop_type || c.name || 'Unknown';
-      byType[type] = (byType[type] || 0) + 1;
+      const type = c.crop_type || c.cropType || c.name || 'Unknown';
+      const variety = c.variety_strain || c.varietyStrain || '';
+      sections.push(`  - ${type} ${variety ? `(${variety})` : ''} (Status: ${c.status || 'Active'})`);
     }
-    sections.push(
-      `\nCROPS (${data.crops.length} total):`,
-      ...Object.entries(byType).map(([type, count]) => `  ${type}: ${count} plot(s)`),
-    );
   } else {
     sections.push('\nCROPS: No crops planted yet.');
   }
