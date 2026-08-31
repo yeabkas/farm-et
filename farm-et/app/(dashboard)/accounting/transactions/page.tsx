@@ -13,13 +13,18 @@ export default function TransactionsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const loadTransactions = async () => {
+      setLoading(true);
       try {
         const response = await fetchTransactions();
         setTransactions(response.data || response || []);
       } catch (err) {
         console.error("Failed to fetch transactions", err);
+      } finally {
+        setLoading(false);
       }
     };
     loadTransactions();
@@ -146,8 +151,15 @@ export default function TransactionsPage() {
         </span>
       </div>
 
-      {/* 3. Main Content: Empty State vs Data Table */}
-      {transactions.length === 0 ? (
+      {/* 3. Main Content: Loading, Empty State, or Data Table */}
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center space-y-2">
+            <div className="w-6 h-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-sm text-gray-500">Loading transactions...</p>
+          </div>
+        </div>
+      ) : transactions.length === 0 ? (
         <TransactionEmptyState onRecordTransactionClick={handleOpenAddForm} />
       ) : (
         <TransactionTable

@@ -128,71 +128,80 @@ export default function CashFlowStatementPage() {
       />
 
       {/* Statement Table */}
-      <div className="border-t border-b border-gray-200 bg-white py-2 overflow-x-auto">
-        <table className="w-full text-left border-collapse text-xs whitespace-nowrap min-w-full">
-          <tbody>
-            {/* BEGINNING CASH BALANCE */}
-            <tr className="border-b border-gray-200 font-bold text-gray-800">
-              <td className="p-3 text-right pr-6" colSpan={1}>
-                Beginning Cash Balance
-              </td>
-              <td className="p-3 text-right w-48">${beginningBalance.toFixed(2)}</td>
-            </tr>
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center space-y-2">
+            <div className="w-6 h-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-sm text-gray-500">Loading Cash Flow statement...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="border-t border-b border-gray-200 bg-white py-2 overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs whitespace-nowrap min-w-full">
+            <tbody>
+              {/* BEGINNING CASH BALANCE */}
+              <tr className="border-b border-gray-200 font-bold text-gray-800">
+                <td className="p-3 text-right pr-6" colSpan={1}>
+                  Beginning Cash Balance
+                </td>
+                <td className="p-3 text-right w-48">${beginningBalance.toFixed(2)}</td>
+              </tr>
 
-            {/* CASH FROM OPERATING ACTIVITIES */}
-            <tr>
-              <td colSpan={2} className="p-3 font-semibold text-gray-800 text-sm">
-                Cash from Operating Activities
-              </td>
-            </tr>
-            {operatingInflows.map((item, idx) => (
-              <tr key={idx} className="border-b border-gray-100">
-                <td className="p-3 text-gray-700 pl-6">{item.category}</td>
-                <td className="p-3 text-right font-medium text-gray-800">
-                  ${item.amount.toFixed(2)}
+              {/* CASH FROM OPERATING ACTIVITIES */}
+              <tr>
+                <td colSpan={2} className="p-3 font-semibold text-gray-800 text-sm">
+                  Cash from Operating Activities
                 </td>
               </tr>
-            ))}
-            <tr className="border-b border-gray-200 font-bold text-gray-800">
-              <td className="p-3 text-right pr-6">Total Cash Inflow:</td>
-              <td className="p-3 text-right">${totalInflow.toFixed(2)}</td>
-            </tr>
+              {operatingInflows.map((item, idx) => (
+                <tr key={idx} className="border-b border-gray-100">
+                  <td className="p-3 text-gray-700 pl-6">{item.category}</td>
+                  <td className="p-3 text-right font-medium text-gray-800">
+                    ${item.amount.toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+              <tr className="border-b border-gray-200 font-bold text-gray-800">
+                <td className="p-3 text-right pr-6">Total Cash Inflow:</td>
+                <td className="p-3 text-right">${totalInflow.toFixed(2)}</td>
+              </tr>
 
-            {/* CASH EXPENDITURES */}
-            <tr>
-              <td colSpan={2} className="p-3 font-semibold text-gray-800 text-sm pt-6">
-                Cash Expenditures
-              </td>
-            </tr>
-            {cashExpenditures.map((item, idx) => (
-              <tr key={idx} className="border-b border-gray-100">
-                <td className="p-3 text-gray-700 pl-6">{item.category}</td>
-                <td className="p-3 text-right font-medium text-gray-800">
-                  -${Math.abs(item.amount).toFixed(2)}
+              {/* CASH EXPENDITURES */}
+              <tr>
+                <td colSpan={2} className="p-3 font-semibold text-gray-800 text-sm pt-6">
+                  Cash Expenditures
                 </td>
               </tr>
-            ))}
-            <tr className="border-b border-gray-200 font-bold text-gray-800">
-              <td className="p-3 text-right pr-6">Total Expenditures:</td>
-              <td className="p-3 text-right">
-                -${Math.abs(totalExpenditures).toFixed(2)}
-              </td>
-            </tr>
+              {cashExpenditures.map((item, idx) => (
+                <tr key={idx} className="border-b border-gray-100">
+                  <td className="p-3 text-gray-700 pl-6">{item.category}</td>
+                  <td className="p-3 text-right font-medium text-gray-800">
+                    -${Math.abs(item.amount).toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+              <tr className="border-b border-gray-200 font-bold text-gray-800">
+                <td className="p-3 text-right pr-6">Total Expenditures:</td>
+                <td className="p-3 text-right">
+                  -${Math.abs(totalExpenditures).toFixed(2)}
+                </td>
+              </tr>
 
-            {/* SUMMARY TOTALS */}
-            <tr className="font-bold text-gray-800 pt-4">
-              <td className="p-3 text-right pr-6">Net Change in Cash:</td>
-              <td className="p-3 text-right">${netChangeInCash.toFixed(2)}</td>
-            </tr>
-            <tr className="font-bold text-emerald-600">
-              <td className="p-3 text-right pr-6">Ending Cash Balance:</td>
-              <td className="p-3 text-right text-emerald-600">
-                ${endingCashBalance.toFixed(2)}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              {/* SUMMARY TOTALS */}
+              <tr className="font-bold text-gray-800 pt-4">
+                <td className="p-3 text-right pr-6">Net Change in Cash:</td>
+                <td className="p-3 text-right">${netChangeInCash.toFixed(2)}</td>
+              </tr>
+              <tr className="font-bold text-emerald-600">
+                <td className="p-3 text-right pr-6">Ending Cash Balance:</td>
+                <td className="p-3 text-right text-emerald-600">
+                  ${endingCashBalance.toFixed(2)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Legal / Tax Disclaimer */}
       <p className="text-[11px] text-gray-500 text-center pt-4">
