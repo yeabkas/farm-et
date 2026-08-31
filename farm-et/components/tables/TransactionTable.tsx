@@ -69,7 +69,7 @@ export function TransactionTable({
                     isExpense ? "text-gray-800" : "text-emerald-600"
                   }`}
                 >
-                  {isExpense ? `-$${tx.amount.toFixed(2)}` : `$${tx.amount.toFixed(2)}`}
+                  {isExpense ? `-$${Number(tx.amount).toFixed(2)}` : `$${Number(tx.amount).toFixed(2)}`}
                 </td>
                 <td className="p-3 text-right">
                   <ActionDropdown
