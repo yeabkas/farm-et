@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { ReportFilterBar } from "@/components/accounting/ReportFilterBar";
 import { fetchTransactions } from "@/lib/services";
 
@@ -18,6 +19,7 @@ interface Transaction {
 }
 
 export default function CashFlowStatementPage() {
+  const router = useRouter();
   const [startDate, setStartDate] = useState("2026-01-01");
   const [endDate, setEndDate] = useState("2026-12-31");
   const [grouping, setGrouping] = useState("No Grouping");
@@ -40,7 +42,7 @@ export default function CashFlowStatementPage() {
   }, []);
 
   const handleUpdate = () => {
-    loadData();
+    router.push("/accounting/transactions");
   };
 
   const { operatingInflows, cashExpenditures, totalInflow, totalExpenditures, netChangeInCash, endingCashBalance } = useMemo(() => {

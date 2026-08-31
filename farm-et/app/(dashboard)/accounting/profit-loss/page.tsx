@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { ReportFilterBar } from "@/components/accounting/ReportFilterBar";
 import { fetchTransactions } from "@/lib/services";
 
@@ -18,6 +19,7 @@ interface Transaction {
 }
 
 export default function PnLStatementPage() {
+  const router = useRouter();
   const [startDate, setStartDate] = useState("2026-01-01");
   const [endDate, setEndDate] = useState("2026-12-31");
   const [grouping, setGrouping] = useState("No Grouping");
@@ -40,8 +42,7 @@ export default function PnLStatementPage() {
   }, []);
 
   const handleUpdate = () => {
-    // Re-filter happens automatically due to useMemo, but we can also re-fetch if needed
-    loadData();
+    router.push("/accounting/transactions");
   };
 
   // Filter and group transactions
