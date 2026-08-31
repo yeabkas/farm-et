@@ -1,5 +1,6 @@
 import { streamText } from 'ai';
 import { groq } from '@ai-sdk/groq';
+import { google } from '@ai-sdk/google';
 import { cookies } from 'next/headers';
 import { fetchFarmData, farmDataToPromptContext } from '@/lib/farm-data-fetcher';
 
@@ -89,6 +90,7 @@ If a user is being rude, disrespectful, or asks off-topic questions (unrelated t
 If you don't know the answer, politely say so. Keep responses relatively short as this is a chat interface.
 ${farmDataContext}`;
 
+  // Use Groq for text by default (fast & cheap)
   let selectedModel = groq('qwen/qwen3.6-27b');
 
   // ── Vision / Image Analysis Logic ──────────────────────────────────────
@@ -113,8 +115,8 @@ ${farmDataContext}`;
       }
 
       if (entityWithImage && entityWithImage.images && entityWithImage.images.length > 0) {
-        // We have an image! Switch to Groq's Vision model
-        selectedModel = groq('llama-3.2-11b-vision-preview');
+        // We have an image! Switch to Gemini 1.5 Flash (Groq vision is decommissioned)
+        selectedModel = google('gemini-1.5-flash');
         
         // Convert text content to multimodal array with image
         const originalText = latestUserMessage.content;
@@ -131,11 +133,15 @@ ${farmDataContext}`;
     }
   }
 
-  const result = streamText({
-    model: selectedModel,
-    system: systemPrompt,
-    messages,
-  });
-
-  return result.toTextStreamResponse();
+  try {
+    const result = streamText({
+      model: selectedModel,
+      system: systemPrompt,
+      messages,
+    });
+    return result.toTextStreamResponse();
+  } catch (error) {
+    console.error("AI Stream Error:", error);
+    return new Response("I encountered an error while trying to generate a response. Please try again.", { status: 500 });
+  }
 }
