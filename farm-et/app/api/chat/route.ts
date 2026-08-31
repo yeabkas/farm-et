@@ -13,11 +13,11 @@ export const maxDuration = 30;
  */
 const DATA_QUERY_PATTERNS = [
   /how much|how many|total|spent|earned|income|expense|profit|loss|revenue/i,
-  /my (farm|animals?|crops?|cattle|livestock|transactions?|balance|money)/i,
-  /show me|list|count|summarize|summary|report|overview/i,
+  /my|i have|do i have|did i|what are|what do/i,
+  /show me|list|count|summarize|summary|report|overview|tell me/i,
   /this (year|month|week|season)/i,
   /cost|budget|financial/i,
-  /what (do i|did i|have i)/i,
+  /crop|animal|livestock|transaction|cattle|harvest|plant|variet|record/i,
 ];
 
 function isDataRelatedQuery(message: string): boolean {
@@ -159,7 +159,7 @@ ${farmDataContext}`;
       system: systemPrompt,
       messages,
     });
-    return result.toTextStreamResponse();
+    return result.toDataStreamResponse();
   } catch (error) {
     console.error("AI Stream Error:", error);
     return new Response("I encountered an error while trying to generate a response. Please try again.", { status: 500 });
