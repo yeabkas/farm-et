@@ -159,7 +159,7 @@ ${farmDataContext}`;
       system: systemPrompt,
       messages,
     });
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error("AI Stream Error:", error);
     return new Response("I encountered an error while trying to generate a response. Please try again.", { status: 500 });

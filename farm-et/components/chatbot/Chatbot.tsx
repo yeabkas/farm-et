@@ -79,59 +79,29 @@ export function Chatbot({ context }: ChatbotProps) {
       const decoder = new TextDecoder();
       let done = false;
       let aiContent = '';
-      let buffer = '';
 
       while (!done) {
         const { value, done: readerDone } = await reader.read();
         done = readerDone;
         if (value) {
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
-          // Keep the last incomplete line in the buffer
-          buffer = lines.pop() || '';
-
-          for (const line of lines) {
-            if (line.startsWith('0:')) {
-              try {
-                const textChunk = JSON.parse(line.substring(2));
-                aiContent += textChunk;
-
-                setMessages(prev =>
-                  prev.map(msg => msg.id === aiMessageId ? { ...msg, content: aiContent } : msg)
-                );
-              } catch {
-                // Ignore incomplete JSON chunks from Vercel stream payload
-              }
-            } else if (line.trim().length > 0 && !line.match(/^[0-9]:/)) {
-              aiContent += line + '\n';
-              setMessages(prev =>
-                prev.map(msg =>
-                  msg.id === aiMessageId ? { ...msg, content: aiContent } : msg
-                )
-              );
+          const chunk = decoder.decode(value, { stream: true });
+          
+          // Clean up any stray `0:"..."` protocol wrappers just in case
+          let cleanChunk = chunk;
+          if (cleanChunk.startsWith('0:')) {
+            try {
+              cleanChunk = JSON.parse(cleanChunk.substring(2));
+            } catch {
+              // ignore parse errors
             }
           }
+          
+          aiContent += cleanChunk;
+          
+          setMessages(prev =>
+            prev.map(msg => msg.id === aiMessageId ? { ...msg, content: aiContent } : msg)
+          );
         }
-      }
-
-      // Process any remaining text in the buffer after the stream ends
-      if (buffer.trim().length > 0) {
-        if (buffer.startsWith('0:')) {
-          try {
-            const textChunk = JSON.parse(buffer.substring(2));
-            aiContent += textChunk;
-          } catch {
-            // ignore
-          }
-        } else if (!buffer.match(/^[0-9]:/)) {
-          aiContent += buffer;
-        }
-
-        setMessages(prev =>
-          prev.map(msg =>
-            msg.id === aiMessageId ? { ...msg, content: aiContent } : msg
-          )
-        );
       }
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error('Something went wrong');
