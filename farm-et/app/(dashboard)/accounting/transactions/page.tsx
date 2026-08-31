@@ -30,8 +30,9 @@ export default function TransactionsPage() {
     let rev = 0;
     let exp = 0;
     transactions.forEach((tx) => {
-      if (tx.type === "Income") rev += tx.amount;
-      if (tx.type === "Expense") exp += tx.amount;
+      const amt = Number(tx.amount) || 0;
+      if (tx.type === "Income") rev += amt;
+      if (tx.type === "Expense") exp += amt;
     });
     return { revenue: rev, expenses: exp, profit: rev - exp };
   }, [transactions]);
