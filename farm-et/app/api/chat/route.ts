@@ -115,8 +115,8 @@ ${farmDataContext}`;
       }
 
       if (entityWithImage && entityWithImage.images && entityWithImage.images.length > 0) {
-        // We have an image! Switch to Gemini 1.5 Flash (Groq vision is decommissioned)
-        selectedModel = google('gemini-1.5-flash');
+        // We have an image! Switch to Gemini 3.5 Flash (Groq vision is decommissioned)
+        selectedModel = google('gemini-3.5-flash');
         
         // Convert text content to multimodal array with image
         const originalText = latestUserMessage.content;
