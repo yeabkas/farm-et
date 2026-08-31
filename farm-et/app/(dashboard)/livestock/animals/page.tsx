@@ -180,6 +180,27 @@ export default function AnimalsPage() {
     }
   };
 
+  const handleDuplicateAnimal = async (animal: Animal) => {
+    try {
+      setIsSubmitting(true);
+      const payload = {
+        ...animal,
+        name: `Copy of ${animal.name}`,
+      };
+      delete (payload as any).id;
+      
+      const res = await api.post("/animals", payload);
+      const created: Animal = res.data?.data ?? res.data;
+      setAnimals((prev) => [...prev, created]);
+      setToast({ type: "success", message: `Successfully duplicated ${animal.name}!` });
+    } catch (error) {
+      console.error("Failed to duplicate animal:", error);
+      setToast({ type: "error", message: "Failed to duplicate animal. Please try again." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleSellAnimal = (animal: Animal) => {
     if (animal.status === "For Sale" || animal.status === "Auction") {
       setToast({ type: "info", message: `${animal.name} is already listed.` });
@@ -261,6 +282,7 @@ export default function AnimalsPage() {
           animals={animals}
           onEdit={handleEditAnimal}
           onSell={handleSellAnimal}
+          onDuplicate={handleDuplicateAnimal}
           onDelete={handleDeleteAnimal}
         />
       )}

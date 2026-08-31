@@ -167,7 +167,7 @@ export function CropTable({
                 {/* Revenue */}
                 <td className="p-3 text-gray-600">
                   {crop.estimatedValue !== undefined && crop.estimatedValue !== null
-                    ? `ETB ${crop.estimatedValue.toFixed(2)} / ${crop.harvestUnits || "unit"}`
+                    ? `ETB ${Number(crop.estimatedValue).toFixed(2)} / ${crop.harvestUnits || "unit"}`
                     : "--"}
                 </td>
 

@@ -180,6 +180,27 @@ export default function CropsPage() {
     }
   };
 
+  const handleDuplicateCrop = async (crop: Crop) => {
+    try {
+      setIsSubmitting(true);
+      const payload = {
+        ...crop,
+        cropType: `Copy of ${crop.cropType}`,
+      };
+      delete (payload as any).id;
+      
+      const res = await api.post("/crops", payload);
+      const created: Crop = res.data?.data ?? res.data;
+      setCrops((prev) => [...prev, created]);
+      setToast({ type: "success", message: `Successfully duplicated ${crop.cropType}!` });
+    } catch (error) {
+      console.error("Failed to duplicate crop:", error);
+      setToast({ type: "error", message: "Failed to duplicate crop. Please try again." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleSellCrop = (crop: Crop) => {
     if (crop.status === "For Sale" || crop.status === "Auction") {
       setToast({ type: "info", message: `${crop.cropType} is already listed.` });
@@ -261,6 +282,7 @@ export default function CropsPage() {
           crops={crops}
           onEdit={handleEditCrop}
           onSell={handleSellCrop}
+          onDuplicate={handleDuplicateCrop}
           onDelete={handleDeleteCrop}
         />
       )}

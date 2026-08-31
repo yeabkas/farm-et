@@ -50,13 +50,24 @@ export default function TransactionsPage() {
   };
 
   // Duplicate an existing transaction
-  const handleDuplicateTransaction = (tx: Transaction) => {
-    const duplicated: Transaction = {
-      ...tx,
-      id: Date.now().toString(),
-      description: tx.description ? `Copy of ${tx.description}` : `Copy of ${tx.category}`,
-    };
-    setTransactions((prev) => [duplicated, ...prev]);
+  const handleDuplicateTransaction = async (tx: Transaction) => {
+    try {
+      const created = await createTransaction({
+        type: tx.type,
+        amount: Number(tx.amount),
+        payeeCustomer: tx.payeeCustomer,
+        category: tx.category,
+        date: tx.date,
+        reportingYear: Number(tx.reportingYear),
+        description: tx.description ? `Copy of ${tx.description}` : `Copy of ${tx.category}`,
+        checkNumber: tx.checkNumber,
+        associatedTo: tx.associatedTo,
+        keywords: tx.keywords,
+      });
+      setTransactions((prev) => [created.data || created, ...prev]);
+    } catch (err) {
+      console.error("Failed to duplicate transaction", err);
+    }
   };
 
   // Delete a transaction
