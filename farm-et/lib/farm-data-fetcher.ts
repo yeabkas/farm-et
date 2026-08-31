@@ -28,6 +28,7 @@ interface Animal {
   breed?: string;
   status?: string;
   tag_number?: string;
+  images?: string[];
   [key: string]: unknown;
 }
 
@@ -39,6 +40,7 @@ interface Crop {
   status?: string;
   planted_at?: string;
   harvested_at?: string;
+  images?: string[];
   [key: string]: unknown;
 }
 

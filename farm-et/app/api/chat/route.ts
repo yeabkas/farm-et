@@ -84,12 +84,54 @@ ${pageContext}
 Your goal is to answer questions about the platform in a concise, friendly, and helpful manner.
 If a user asks about navigation, tell them exactly which sidebar section and page to click.
 If a user asks how to add a product, crop, or animal to their farm, direct them to Plantings > Crops or Livestock > Animals respectively, not the Market Dashboard (which is for selling).
+If a user asks you to analyze an image, look at the provided image carefully and give them a professional agricultural assessment.
 If a user is being rude, disrespectful, or asks off-topic questions (unrelated to farming, agriculture, or the Farm-ET platform), politely decline to answer and gently guide them back to how you can help them with their farm management.
 If you don't know the answer, politely say so. Keep responses relatively short as this is a chat interface.
 ${farmDataContext}`;
 
+  let selectedModel = groq('qwen/qwen3.6-27b');
+
+  // ── Vision / Image Analysis Logic ──────────────────────────────────────
+  if (latestUserMessage && typeof latestUserMessage.content === 'string') {
+    const wantsAnalysis = /analyze|look at|inspect|check/i.test(latestUserMessage.content);
+    
+    if (wantsAnalysis) {
+      // Find the first animal or crop with an image for analysis
+      let entityWithImage: { images?: string[] } | undefined = undefined;
+      
+      try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('auth_token')?.value;
+        if (token) {
+          const farmData = await fetchFarmData(token);
+          entityWithImage = farmData.animals.find(a => a.images && a.images.length > 0) || 
+                            farmData.crops.find(c => c.images && c.images.length > 0);
+        }
+      } catch (err) {
+        console.error("Failed to fetch image data for analysis", err);
+      }
+
+      if (entityWithImage && entityWithImage.images && entityWithImage.images.length > 0) {
+        // We have an image! Switch to Groq's Vision model
+        selectedModel = groq('llama-3.2-11b-vision-preview');
+        
+        // Convert text content to multimodal array with image
+        const originalText = latestUserMessage.content;
+        latestUserMessage.content = [
+          { type: 'text', text: originalText }
+        ];
+        
+        // Add the first image found
+        latestUserMessage.content.push({ 
+          type: 'image', 
+          image: new URL(entityWithImage.images[0])
+        });
+      }
+    }
+  }
+
   const result = streamText({
-    model: groq('qwen/qwen3.6-27b'),
+    model: selectedModel,
     system: systemPrompt,
     messages,
   });
