@@ -194,7 +194,7 @@ export default function CashFlowStatementPage() {
 
       {/* Legal / Tax Disclaimer */}
       <p className="text-[11px] text-gray-500 text-center pt-4">
-        Farmbrite is not responsible for the accuracy of this data. Always
+        FarmET is not responsible for the accuracy of this data. Always
         double check your records and confer with a professional tax accountant
         before submitting for tax purposes.
       </p>

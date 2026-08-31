@@ -162,7 +162,7 @@ export default function PnLStatementPage() {
 
       {/* Legal/Disclaimer Notice */}
       <p className="text-[11px] text-gray-500 pt-2">
-        Farmbrite is not responsible for the accuracy of this data. Always
+        FarmET is not responsible for the accuracy of this data. Always
         review and double check your records with an accounting professional.
       </p>
     </div>
